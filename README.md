@@ -23,13 +23,13 @@ Open [the local studio](http://127.0.0.1:8741). On macOS, `launch.command` start
 
 1. Drop one or more files, or select a public toolkit plasmid and choose **Load public example**.
 2. Review the feature table. Edit labels, roles, colors, module names, and visibility.
-3. Choose **Schematic** for a presentation or **Coordinates** to check positions.
+3. Choose **Schematic** for a presentation or **Coordinates** to check positions. **Detailed** annotations show lengths, strands, source notes and short annotated sequences; **Overview** keeps compact modules.
 4. Export **PowerPoint**. Select a named feature group and ungroup it to edit individual glyph strokes or text. Copy groups into your own deck.
 5. **Save project** preserves all loaded constructs and illustration settings. **Open project** restores them. **Export all constructs** combines figures into one PPTX.
 
-The studio includes real public **YTK pYTK001**, **MYT pMYT001**, and **YSD 2.0 pYSD891** examples, with source links, checksums and recorded display curation. The random-DNA fixture remains for tests. See [public demo provenance and data licenses](docs/PUBLIC_DEMOS.md).
+The studio includes real public **YTK pYTK001**, **MYT pMYT001/pMYT075/pMYT095**, and **YSD 2.0 pYSD891** examples, with source links, checksums and recorded display curation. The random-DNA fixture remains for tests. See [public demo provenance and data licenses](docs/PUBLIC_DEMOS.md).
 
-## What works in v0.2
+## What works in v0.3
 
 | Area | Support |
 | --- | --- |
@@ -55,10 +55,14 @@ For unannotated DNA, use **Match reference parts** with a trusted local part lib
 
 [pLannotate setup and annotation behavior](docs/ANNOTATION.md)
 
+## Detailed annotation
+
+The teaching view adds source coordinates, length, strand, homology-arm/barcode/primer context, source notes and editable callouts alongside SBOL glyphs. New public MYT examples show an Int.1 donor and a Cas9/gRNA-processing vector. [Detailed annotation behavior and coordinate limits](docs/DETAILED_ANNOTATIONS.md).
+
 ## Command line
 
 ```bash
-auraconstruct export plasmid.gb -o figure.pptx
+auraconstruct export plasmid.gb -o figure.pptx --detail detailed
 auraconstruct export vector.dna -o figure.svg --palette colorblind
 auraconstruct export construct.fa -o figure.pptx --reference trusted-parts.gb --topology circular
 auraconstruct export construct.fa -o figure.pptx --annotate plannotate --topology linear
@@ -68,7 +72,7 @@ auraconstruct export annotated.gb -o coordinates.pptx --layout proportional
 
 For multiple SVG pages, the CLI writes numbered SVG files. The browser app downloads a ZIP. Proportional mode places exact colored interval tracks on a shared bp axis; glyph widths have readability limits. In schematic mode, part order follows sequence coordinates and lengths are not to scale. Lanes in coordinate mode separate overlapping features on the same DNA molecule.
 
-[Editable public demo examples](examples/AuraConstruct_Aureka_Public_Demos.pptx) combine the YTK, MYT and YSD 2.0 figures.
+[Editable detailed MYT examples](examples/AuraConstruct_Detailed_MYT_Annotations.pptx) show donor arms, barcodes, primer sites and Cas9/gRNA annotations. [Editable public demo examples](examples/AuraConstruct_Aureka_Public_Demos.pptx) combine the YTK, MYT and YSD 2.0 figures.
 
 ## Design references
 
@@ -84,7 +88,7 @@ The useful gap is the editable PPTX workflow. The projects reviewed document str
 - No gene function, regulatory interaction, promoter strength, expression level or biological performance is inferred from drawing order.
 - Circular DNA is displayed as a linearized construct. Joined locations retain their ordered segments. The schematic sorts by the smallest segment coordinate, so origin-crossing features need coordinate-view review.
 - Fuzzy coordinates use integer bounds for drawing. The project retains a fuzzy flag and the imported location string; GenBank export writes those integer locations with the original string in a qualifier.
-- Dense maps paginate at 16 features per schematic slide or three coordinate lanes per slide. Very long display labels may shorten; full labels remain in the project, GenBank and speaker notes.
+- Overview maps paginate at 16 features per schematic slide or three coordinate lanes per slide. Detailed maps use eight features per slide or two coordinate lanes. Very long display labels may shorten; full labels remain in the project, GenBank and speaker notes.
 - Input limit: 20 MB after decompression. This tool targets constructs and plasmids, rather than whole-genome annotation or assembly analysis.
 - SnapGene sequence and features are imported through Biopython. Proprietary history, enzyme catalogs and cloning operations are outside this version.
 - pLannotate integration requires its own installed tools and databases. The adapter is tested with a controlled executable result; a live pLannotate database run was not performed in the development environment.

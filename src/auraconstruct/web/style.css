@@ -150,3 +150,4 @@ h2{font-weight:600}
 .product-name{font-size:14px;padding-left:10px}
 .topbar{padding:0 12px}
 }
+td:nth-child(7){min-width:210px}td:nth-child(7) input{min-width:190px}

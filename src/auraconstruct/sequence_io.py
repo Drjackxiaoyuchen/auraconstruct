@@ -76,7 +76,9 @@ def from_record(record, filename, fmt, parse_warnings=None, index=0):
                           f.location.strand or 0, qualifiers=q, role_source=role_source, fuzzy=fuzzy,
                           source=q.get("auraconstruct_source", ["imported"])[0],
                           module=q.get("auraconstruct_module", [""])[0],
-                          segment_strands=[p.strand or 0 for p in parts]))
+                          segment_strands=[p.strand or 0 for p in parts],
+                          caption=q.get("ac_caption", [""])[0],
+                          caption_source=q.get("ac_caption_source", ["user-caption"])[0]))
     if not fs:
         notices.append("No annotations found. Use a reference library, pLannotate, or add features manually.")
     if any(f.role_source == "label-heuristic" for f in fs):
@@ -89,13 +91,19 @@ def from_record(record, filename, fmt, parse_warnings=None, index=0):
     c = Construct(f"record-{index + 1}", name,
                   str(record.seq).upper(), record.annotations.get("topology", "unknown"),
                   fs, Path(filename).name, fmt, notices)
+    description=record.description if record.description not in (".","<unknown description>",name) else ""
+    if not description:
+        import re
+        match=re.search(r"Description:\s*(.*?)(?:YTK Part Type:|Antibiotic Resistance:|$)",str(record.annotations.get("comment","")),re.S)
+        description=" ".join(match.group(1).split()) if match else ""
+    c.description=description[:300]
     return validate(c)
 
 
 def to_genbank(c: Construct) -> bytes:
     validate(c)
     r = SeqRecord(Seq(c.sequence), id=c.name.replace(" ", "_")[:64],
-                  name=c.name.replace(" ", "_")[:64], description="AuraConstruct annotated sequence")
+                  name=c.name.replace(" ", "_")[:64], description=c.description or "AuraConstruct annotated sequence")
     r.annotations = {"molecule_type": "DNA"}
     if c.topology != "unknown":
         r.annotations["topology"] = c.topology
@@ -105,7 +113,8 @@ def to_genbank(c: Construct) -> bytes:
         loc = locations[0] if len(locations) == 1 else CompoundLocation(locations)
         q = dict(f.qualifiers)
         q.update(label=[f.label], auraconstruct_role=[f.role], auraconstruct_source=[f.source],
-                 auraconstruct_module=[f.module])
+                 auraconstruct_module=[f.module], ac_caption=[f.caption],
+                 ac_caption_source=[f.caption_source])
         r.features.append(SeqFeature(loc, type=f.type, qualifiers=q))
     output = io.StringIO()
     SeqIO.write(r, output, "genbank")

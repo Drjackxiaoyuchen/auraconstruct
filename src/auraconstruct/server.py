@@ -127,7 +127,7 @@ def create_app():
 
 def options(data):
     raw = data.get("options",{})
-    return {k:v for k,v in raw.items() if k in ("layout","palette","coordinates","title")}
+    return {k:v for k,v in raw.items() if k in ("layout","palette","coordinates","title","detail")}
 
 
 def download(content, name, mimetype):

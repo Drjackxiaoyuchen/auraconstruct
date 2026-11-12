@@ -10,6 +10,8 @@ ROLES = {
     "terminator": "SO:0000141", "origin": "SO:0000296", "operator": "SO:0000057",
     "primer": "SO:0005850", "scar": "SO:0001953", "ncrna": "SO:0000655",
     "recombination": "SO:0000299", "polya": "SO:0000553", "generic": None,
+    "region": None, "engineered_region": "SO:0000804", "spacer": "SO:0002223",
+    "nuclease_site": "SO:0001687",
 }
 
 
@@ -29,6 +31,8 @@ class Feature:
     module: str = ""
     fuzzy: bool = False
     segment_strands: list[int] = field(default_factory=list)
+    caption: str = ""
+    caption_source: str = "user-caption"
 
     @property
     def start(self):
@@ -54,6 +58,7 @@ class Construct:
     source_format: str
     warnings: list[str] = field(default_factory=list)
     provenance: dict = field(default_factory=dict)
+    description: str = ""
 
     @property
     def length(self):
@@ -72,10 +77,10 @@ def infer_role(kind: str, qualifiers: dict, label: str) -> tuple[str, str]:
     """Prefer semantics over label guesses. Every guess is recorded separately."""
     direct = {"CDS": "cds", "promoter": "promoter", "RBS": "rbs",
               "terminator": "terminator", "rep_origin": "origin", "oriT": "generic",
-              "protein_bind": "generic", "operator": "operator", "primer_bind": "primer",
+              "protein_bind": "generic", "operator": "operator", "primer_bind": "primer", "primer":"primer",
               "ncRNA": "ncrna", "tRNA": "ncrna", "rRNA": "ncrna",
               "misc_recomb": "recombination", "polyA_signal": "polya", "polyA_site": "polya"}
-    if kind in direct:
+    if kind in direct and direct[kind]!="generic":
         return direct[kind], "feature-type"
     reg = " ".join(qualifiers.get("regulatory_class", [])).lower()
     classes = {"promoter": "promoter", "ribosome_binding_site": "rbs",
@@ -88,16 +93,29 @@ def infer_role(kind: str, qualifiers: dict, label: str) -> tuple[str, str]:
     for role, so in ROLES.items():
         if so and so in terms:
             return role, "sequence-ontology"
+    if kind in direct:
+        return direct[kind], "feature-type"
     # Label-only assignments affect illustration, never sequence annotation.
     hints = [(r"\bpromoter\b|^p(?:GAL\d|TEF\d|ADH\d|T7|BAD|Lac|Tac)", "promoter"),
              (r"\bterminator\b|\b(?:rrnB|T7Te)\b", "terminator"),
              (r"\b(?:RBS|ribosome binding|ribosome entry)\b", "rbs"),
              (r"\b(?:origin|ColE1|pUC ori|2 micron)\b", "origin"),
+             (r"^(?:2micron|pBBR1)$", "origin"),
+             (r"\b(?:FRT|loxP|lox2272)\b", "recombination"),
              (r"\boperator\b", "operator"), (r"\bprimer\b", "primer"),
+             (r"(?:^|[\s_])(?:FP|RP)$", "primer"),
              (r"\b(?:assembly scar|scar)\b", "scar")]
     for pattern, role in hints:
         if re.search(pattern, label, re.I):
             return role, "label-heuristic"
+    if re.fullmatch(r"(?:CamR|AmpR|KanR|NatR|HygR|ZeoR|SpecR|Cas9|sfGFP|mScarlet(?:-I)?|mCherry|GFP|URA3|LEU2|HIS3|TRP1|LYS2|MET17)",label,re.I):
+        return "cds", "label-heuristic"
+    if re.search(r"gRNA scaffold|\btRNA\b|^t(?:GCC|CCC)$",label,re.I):
+        return "ncrna", "label-heuristic"
+    if re.search(r"homology|\b[35]['′’]?\s*HA\b|\b(?:barcode|overhang|NLS|linker|tag)\b|^Con[SLRE]\d*$",label,re.I):
+        return "region", "label-heuristic"
+    if re.search(r"inert DNA spacer",label,re.I):
+        return "spacer", "label-heuristic"
     return "generic", "unspecified"
 
 
@@ -117,8 +135,8 @@ def validate(c: Construct):
             raise ValueError(f"Invalid strand or glyph role for {f.label!r}.")
         if f.segment_strands and (len(f.segment_strands) != len(f.segments) or any(s not in (-1,0,1) for s in f.segment_strands)):
             raise ValueError("Segment strands must match the number of joined segments.")
-        if len(f.label) > 240 or len(f.module) > 100:
-            raise ValueError("Shorten the feature label (240 characters) or module (100).")
+        if len(f.label) > 240 or len(f.module) > 100 or len(f.caption)>400:
+            raise ValueError("Shorten the feature label (240 characters), module (100), or caption (400).")
         if f.color and not re.fullmatch(r"#[0-9a-fA-F]{6}", f.color):
             raise ValueError("Colors must be six-digit hex values, for example #377EB8.")
     return c

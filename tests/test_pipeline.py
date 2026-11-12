@@ -95,6 +95,8 @@ def test_role_priority_and_heuristic_disclosure():
     assert infer_role("regulatory",{"regulatory_class":["promoter"]},"x")==("promoter","regulatory-class")
     assert infer_role("misc_feature",{},"GAL1 Promoter")==("promoter","label-heuristic")
     assert infer_role("misc_feature",{},"mystery")==("generic","unspecified")
+    assert infer_role("primer",{},"AmpR_primer_F_inside")==("primer","feature-type")
+    assert infer_role("protein_bind",{"db_xref":["SO:0000057"]},"site")==("operator","sequence-ontology")
 
 
 def test_exact_match_both_strands_and_circular_origin():
@@ -187,7 +189,7 @@ def test_plannotate_adapter_merges_and_preserves_imports(monkeypatch):
     assert result.sequence==c.sequence
 
 
-@pytest.mark.parametrize("demo_id",["ytk001","myt001","ysd891"])
+@pytest.mark.parametrize("demo_id",["ytk001","myt001","myt075","myt095","ysd891"])
 def test_public_demo_provenance_and_export(demo_id):
     import hashlib
     from auraconstruct.demos import load_demo
@@ -206,3 +208,42 @@ def test_public_demo_provenance_and_export(demo_id):
     response=create_app().test_client().get(f'/api/demo?id={demo_id}')
     assert response.status_code==200
     assert response.json['records'][0]['sha256']==c.to_dict()['sha256']
+
+
+def test_detailed_captions_and_short_sequences_keep_their_sources():
+    from auraconstruct.details import category,summary,short_sequence
+    c=Construct('x','x','ATGCCGTAGCTAACCGGTTAA','linear',[], 'x.gb','genbank')
+    f=Feature('primer','ConE RP','misc_feature','primer',[[2,14]],-1,
+              qualifiers={'note':['Source note about a primer site.']})
+    assert short_sequence(c,f)==f"5′ {str(Seq(c.sequence[2:14]).reverse_complement())} 3′"
+    assert summary(f)==('Source note about a primer site.','qualifier:note')
+    f.caption='Manually reviewed callout';assert summary(f)==(f.caption,'user-caption')
+    c.features=[f]
+    restored=read_bytes(to_genbank(c),'roundtrip.gb')[0].features[0]
+    assert restored.caption==f.caption and restored.caption_source=='user-caption'
+    site=Feature('site','BsaI','protein_bind','generic',[[0,4]],1)
+    assert category(site)=='Restriction-related annotation'
+    assert short_sequence(c,site)=='5′ ATGC 3′'
+    # A label alone does not establish an exact cleavage coordinate or overhang.
+    assert infer_role('protein_bind',{},'BsaI')==('generic','feature-type')
+
+
+def test_detailed_mode_has_coordinates_notes_and_native_objects():
+    from auraconstruct.demos import load_demo
+    c=load_demo('myt075')
+    c.features[0].caption='Reviewed homology arm caption'
+    c.features[0].caption_source='user-caption'
+    pages=build_pages(c,detail='detailed')
+    assert len(pages)==3
+    svg=to_svg(pages[0])
+    assert '519 bp' in svg and 'Homology arm' in svg and 'Reviewed homology arm caption' in svg
+    assert 'Genomic' not in svg  # Donor coordinates are not silently promoted to genomic coordinates.
+    with ZipFile(io.BytesIO(to_pptx(pages))) as z:
+        notes=z.read('ppt/notesSlides/notesSlide1.xml').decode()
+        assert 'caption (user-caption): Reviewed homology arm caption' in notes
+        root=ET.fromstring(z.read('ppt/slides/slide1.xml'))
+        assert len(root.findall(f'.//{{{P}}}grpSp'))==8
+        assert any('519 bp' in (e.text or '') for e in root.findall(f'.//{{{A}}}t'))
+    for layout in ('schematic','proportional'):
+        for p in build_pages(c,layout=layout,detail='detailed'):
+            assert all(s.x>=0 and s.y>=0 and s.x+s.w<=W+1 and s.y+s.h<=H+1 for s in p.items)

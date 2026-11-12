@@ -13,6 +13,7 @@ import textwrap
 
 from .model import ROLES, validate
 from .brand import AUREKA_COLORS, PURPLE, DEEP_PURPLE, YELLOW, INK, MUTED, FAINT, FONT, LOGO
+from .details import category, summary, position_text, short_sequence
 
 W, H = 1440, 810
 PALETTES = {
@@ -26,6 +27,8 @@ LABELS = {"promoter": "Promoter", "rbs": "Ribosome entry site", "cds": "Coding s
           "terminator": "Terminator", "origin": "Replication origin", "operator": "Operator",
           "primer": "Primer binding site", "scar": "Assembly scar", "ncrna": "Non-coding RNA",
           "recombination": "Recombination site", "polya": "PolyA site", "generic": "Unspecified"}
+LABELS.update(region="Unspecified region", engineered_region="Engineered region",
+              spacer="Inert DNA spacer", nuclease_site="Nuclease cleavage site")
 
 
 @dataclass
@@ -107,6 +110,17 @@ def glyph(page, role, x, y, width=90, color=INK, strand=1, group=""):
         path([("M", -r, 0), ("C", -r, -k, -k, -r, 0, -r),
               ("C", k, -r, r, -k, r, 0), ("C", r, k, k, r, 0, r),
               ("C", -k, r, -r, k, -r, 0), ("Z",)], "#FFFFFF")
+    elif role == "region":
+        path([("M", -half+18, -19), ("L", half, -19), ("L", half, 19),
+              ("L", -half+18, 19), ("C", -half-8, 19, -half-8, -19, -half+18, -19), ("Z",)], "#FFFFFF")
+    elif role == "engineered_region":
+        path([("M", -half, -19), ("L", half, -19), ("L", half, 19), ("L", -half, 19), ("Z",)], "#FFFFFF")
+    elif role == "spacer":
+        glyph(page,"origin",x,y,48,color,strand,group)
+        path([("M", -14, -14), ("L", 14, 14), ("M", -14, 14), ("L", 14, -14)])
+    elif role == "nuclease_site":
+        path([("M", 0, 0), ("L", 0, -34), ("M", -13, -47), ("L", 13, -21),
+              ("M", -13, -21), ("L", 13, -47)])
     elif role == "operator":
         path([("M", -18, -27), ("L", -18, 0), ("L", 18, 0), ("L", 18, -27)])
     elif role == "primer":
@@ -138,6 +152,8 @@ def _header(c, page_number, page_count, layout, selected):
     p = Page(title)
     p.text(title, 74, 43, 1288, 33, bold=True, h=48)
     p.text(f"{c.length:,} bp   /   {c.topology} DNA   /   {selected} illustrated features", 76, 98, 1280, 17, MUTED)
+    if c.description:
+        p.text(textwrap.shorten(c.description,width=160,placeholder="…"),76,120,1288,12,MUTED)
     p.line(76, 141, 1364, 141, FAINT, 1)
     p.line(76, 141, 150, 141, PURPLE, 4)
     p.line(150, 141, 183, 141, YELLOW, 4)
@@ -168,17 +184,21 @@ def _coordinate(f):
 def _feature_notes(p, features):
     for f in features:
         p.notes += f"\n{f.id}: {f.label}; {_coordinate(f)}; role={f.role}; role source={f.role_source}; annotation source={f.source}"
+        caption, caption_source=summary(f)
+        if caption:p.notes += f"; caption ({caption_source}): {caption}"
 
 
-def build_pages(c, layout="schematic", palette="aureka", coordinates=False, title=None):
+def build_pages(c, layout="schematic", palette="aureka", coordinates=False, title=None, detail="overview"):
     validate(c)
-    if layout not in ("schematic", "proportional") or palette not in PALETTES:
+    if layout not in ("schematic", "proportional") or palette not in PALETTES or detail not in ("overview","detailed"):
         raise ValueError("Unknown layout or palette.")
     features = sorted([f for f in c.features if f.visible], key=lambda f: (f.start, f.end, f.id))
     if len(features) > 5000:
         raise ValueError("Choose at most 5,000 illustrated features.")
     if layout == "proportional":
-        return proportional_pages(c, features, palette, title)
+        return proportional_pages(c, features, palette, title, detail)
+    if detail == "detailed":
+        return detailed_pages(c, features, palette, title)
     # Eight parts per row and two rows per page keep every part editable/readable.
     count = max(1, math.ceil(len(features) / 16))
     pages = []
@@ -240,7 +260,61 @@ def build_pages(c, layout="schematic", palette="aureka", coordinates=False, titl
     return pages
 
 
-def proportional_pages(c, features, palette, title=None):
+def detailed_pages(c,features,palette,title=None):
+    """Four parts per row, with room for sequence-grounded teaching annotations."""
+    chunks=[features[i:i+8] for i in range(0,len(features),8)] or [[]]
+    # Avoid leaving one or two isolated parts on an otherwise empty final slide.
+    if len(chunks)>1 and len(chunks[-1])<4:
+        tail=chunks[-2]+chunks[-1];split=math.ceil(len(tail)/2)
+        chunks[-2:]=[tail[:split],tail[split:]]
+    count=len(chunks)
+    pages=[]
+    for pg in range(count):
+        chunk=chunks[pg]
+        p=_header(c,pg+1,count,"schematic",len(features))
+        if title:p.items[0].text=title[:100]
+        if not chunk:
+            p.line(140,365,1300,365,INK,2)
+            p.text("Unannotated DNA",470,395,500,22,MUTED,align="center")
+        rows=math.ceil(len(chunk)/4)
+        columns=math.ceil(len(chunk)/rows) if rows else 4
+        for row in range(rows):
+            subset=chunk[row*columns:(row+1)*columns]
+            step=min(310,1220/len(subset));left=(W-step*len(subset))/2
+            y=250+row*275 if rows>1 else 350
+            p.line(left-12,y,left+step*len(subset)+12,y,INK,2)
+            if row or pg:
+                p.line(left-27,y-7,left-20,y+7,MUTED,1.5);p.line(left-20,y-7,left-13,y+7,MUTED,1.5)
+            if row<rows-1 or pg<count-1:
+                end=left+step*len(subset)
+                p.line(end+15,y-7,end+22,y+7,MUTED,1.5);p.line(end+22,y-7,end+29,y+7,MUTED,1.5)
+            for i,f in enumerate(subset):
+                x=left+(i+.5)*step;g=f.id;col=x-step/2+9;width=step-18
+                glyph(p,f.role,x,y,112,color_for(f,palette),f.strand,g)
+                lines=textwrap.wrap(f.label,width=int(width/10),break_long_words=True)
+                shown=lines[:2]
+                if len(lines)>2:shown[-1]=shown[-1][:-1]+"…"
+                for j,line in enumerate(shown):
+                    p.text(line,col,y+61+j*22,width,18,bold=f.role=="cds",align="center",group=g)
+                p.text(position_text(f),col,y+113,width,12,MUTED,align="center",group=g)
+                cat=category(f)
+                if f.module:cat += " / "+f.module
+                p.text(textwrap.shorten(cat,width=46,placeholder="…"),col,y+131,width,12,DEEP_PURPLE,align="center",group=g)
+                caption,source=summary(f)
+                if caption:
+                    notes=textwrap.wrap(caption,width=int(width/6.8),break_long_words=True)
+                    for j,line in enumerate(notes[:2]):
+                        if j==1 and len(notes)>2:line=line[:-1]+"…"
+                        p.text(line,col,y+152+j*16,width,12,MUTED,align="center",group=g)
+                seq=short_sequence(c,f)
+                if seq:p.text(seq,col,y+189,width,12,INK,align="center",group=g)
+        _feature_notes(p,chunk)
+        p.notes += "\nDetailed schematic: coordinates, lengths and short sequences come from the imported record. Source feature notes and user captions remain distinct. Sequence-order layout separates overlapping features for readability; it does not assert that they are disjoint. Label-derived categories do not establish biological function or exact cut positions."
+        pages.append(p)
+    return pages
+
+
+def proportional_pages(c, features, palette, title=None, detail="overview"):
     # Reserve each label's horizontal footprint when packing lanes.
     x0, span, scale = 110, 1220, 1220 / c.length
     lanes = []
@@ -253,15 +327,16 @@ def proportional_pages(c, features, palette, title=None):
             lanes.append([])
         lanes[lane].append((left,right))
         placements.append((f,lane))
-    count = max(1, math.ceil(len(lanes)/3))
+    per_page=2 if detail=="detailed" else 3
+    count = max(1, math.ceil(len(lanes)/per_page))
     pages = []
     for pg in range(count):
         p = _header(c, pg+1, count, "proportional", len(features))
         if title:
             p.items[0].text = title[:100]
         # A second, fine track below each glyph encodes the exact segment interval.
-        for lane in range(pg*3, min((pg+1)*3, max(1,len(lanes)))):
-            y = 255+(lane % 3)*155
+        for lane in range(pg*per_page, min((pg+1)*per_page, max(1,len(lanes)))):
+            y = 255+(lane % per_page)*(220 if detail=="detailed" else 155)
             p.line(x0, y, x0+span, y, FAINT, 1.5)
             for f, assigned in placements:
                 if assigned != lane:
@@ -276,6 +351,9 @@ def proportional_pages(c, features, palette, title=None):
                     lx = max(76, min(mid-110, W-296))
                     label = f.label if si == 0 else f"{f.label} (join {si+1})"
                     p.text(textwrap.shorten(label,width=30,placeholder="…"), lx,y+76,220,14,align="center",group=f.id)
+                    if detail=="detailed":
+                        p.text(f"{a+1:,}..{b:,} / {b-a:,} bp",lx,y+97,220,11,MUTED,align="center",group=f.id)
+                        p.text(textwrap.shorten(category(f),width=34,placeholder="…"),lx,y+115,220,11,DEEP_PURPLE,align="center",group=f.id)
             if not features:
                 p.text("Unannotated DNA", 470, y+55, 500, 22, MUTED, align="center")
         p.line(x0, 707, x0+span, 707, MUTED, 1)
@@ -284,7 +362,7 @@ def proportional_pages(c, features, palette, title=None):
             pos = 1 if i == 0 else round(c.length*i/5)
             p.line(x,707,x,713,MUTED,1)
             p.text(f"{pos:,}",x-60,717,120,12,MUTED,align="center")
-        _feature_notes(p,[f for f,l in placements if pg*3<=l<(pg+1)*3])
+        _feature_notes(p,[f for f,l in placements if pg*per_page<=l<(pg+1)*per_page])
         p.notes += "\nProportional view: colored interval tracks carry exact segment coordinates; glyphs have minimum/maximum widths for readability. Separate lanes do not imply separate DNA molecules."
         pages.append(p)
     return pages

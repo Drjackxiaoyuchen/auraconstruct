@@ -1,7 +1,8 @@
 /* No external scripts, analytics, sequence storage, or remote annotation calls. */
 const $=id=>document.getElementById(id);
-const state={records:[],index:0,pages:[],page:0,options:{layout:'schematic',palette:'aureka',coordinates:false}};
+const state={records:[],index:0,pages:[],page:0,options:{layout:'schematic',palette:'aureka',coordinates:false,detail:'detailed'}};
 const roles={promoter:'Promoter',rbs:'Ribosome entry site',cds:'Coding sequence',terminator:'Terminator',origin:'Replication origin',operator:'Operator',primer:'Primer binding site',scar:'Assembly scar',ncrna:'Non-coding RNA',recombination:'Recombination site',polya:'PolyA site',generic:'Unspecified'};
+Object.assign(roles,{region:'Unspecified region',engineered_region:'Engineered region',spacer:'Inert DNA spacer',nuclease_site:'Nuclease cleavage site'});
 let palettes={aureka:['#4200AC','#F9AC2F','#6500FF','#FF6D8E','#6FC0A9','#8882BE','#555656']};
 let roleColorIndices={promoter:0,rbs:1,cds:2,terminator:3,origin:4,operator:5,generic:6};
 function defaultColor(role){return (palettes[state.options.palette]||palettes.aureka)[roleColorIndices[role]??6];}
@@ -47,7 +48,7 @@ function showPage(){
   $('pageInfo').textContent=`${state.page+1} / ${state.pages.length||1}`;
   $('prevPage').disabled=state.page<=0;$('nextPage').disabled=state.page>=state.pages.length-1;
   $('viewLabel').textContent=state.options.layout==='schematic'?'Schematic view':'Sequence coordinates';
-  $('figureCaption').textContent=state.options.layout==='schematic'?'Not to scale. Every glyph and label remains editable in PowerPoint.':'Colored interval tracks show exact spans. Glyph widths adjust for readability.';
+  $('figureCaption').textContent=state.options.layout==='schematic'?(state.options.detail==='detailed'?'Not to scale. Imported positions, lengths, notes and short sequences accompany editable SBOL glyphs.':'Not to scale. Every glyph and label remains editable in PowerPoint.'):'Colored interval tracks show exact spans. Glyph widths adjust for readability.';
 }
 function td(child){const el=document.createElement('td');el.append(child);return el;}
 function input(value,change,placeholder=''){
@@ -68,6 +69,7 @@ function updateTable(){
     const pos=document.createElement('span');pos.className='position';pos.textContent=f.segments.map(([a,b])=>`${a+1}..${b}`).join(', ')+` / ${f.strand===1?'+':f.strand===-1?'−':'?'}`+(f.fuzzy?' ≈':'');row.append(td(pos));
     const color=document.createElement('input');color.type='color';color.value=f.color||defaultColor(f.role);color.setAttribute('aria-label',`Color for ${f.label}`);color.addEventListener('input',()=>{f.color=color.value;scheduleRender();});row.append(td(color));
     const module=input(f.module,v=>{f.module=v;scheduleRender();},'No module');module.maxLength=100;module.setAttribute('aria-label','Module name');row.append(td(module));
+    const caption=input(f.caption||'',v=>{f.caption=v;f.caption_source='user-caption';scheduleRender();},'Use source note');caption.maxLength=400;caption.setAttribute('aria-label','Annotation callout');row.append(td(caption));
     const evidence=document.createElement('span');evidence.className='evidence'+(f.role_source==='label-heuristic'?' heuristic':'');evidence.textContent=`${f.source} / ${f.role_source}`;evidence.title=`Original type: ${f.type}\n${JSON.stringify(f.qualifiers,null,2)}`;row.append(td(evidence));return row;
   });
   $('featureTable').replaceChildren(...rows);
@@ -99,6 +101,7 @@ $('topology').addEventListener('change',()=>{if(current()){current().topology=$(
 for(const button of document.querySelectorAll('[data-layout]'))button.addEventListener('click',()=>{state.options.layout=button.dataset.layout;for(const b of document.querySelectorAll('[data-layout]'))b.classList.toggle('active',b===button);scheduleRender();});
 $('palette').addEventListener('change',()=>{state.options.palette=$('palette').value;updateTable();scheduleRender();});
 $('coordinates').addEventListener('change',()=>{state.options.coordinates=$('coordinates').checked;scheduleRender();});
+$('detail').addEventListener('change',()=>{state.options.detail=$('detail').value;state.page=0;scheduleRender();});
 $('prevPage').addEventListener('click',()=>{if(state.page>0){state.page--;showPage();}});
 $('nextPage').addEventListener('click',()=>{if(state.page<state.pages.length-1){state.page++;showPage();}});
 $('featureSearch').addEventListener('input',updateTable);
@@ -119,7 +122,7 @@ $('plannotate').addEventListener('click',guarded(async()=>{
 $('projectInput').addEventListener('change',guarded(async e=>{
   const file=e.target.files[0];if(!file)return;
   const raw=JSON.parse(await file.text());const res=await api('/api/project',raw);const data=await res.json();
-  state.options={...state.options,...data.options};$('palette').value=state.options.palette;$('coordinates').checked=state.options.coordinates;
+  state.options={...state.options,...data.options};$('palette').value=state.options.palette;$('coordinates').checked=state.options.coordinates;$('detail').value=state.options.detail;
   for(const b of document.querySelectorAll('[data-layout]'))b.classList.toggle('active',b.dataset.layout===state.options.layout);
   setRecords(data.records);notice('Project restored.');e.target.value='';
 }));

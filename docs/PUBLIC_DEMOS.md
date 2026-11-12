@@ -1,6 +1,6 @@
 # Public toolkit demos
 
-The studio includes three real published plasmid sequence files. Each is an unmodified member of a publicly downloadable archive. `src/auraconstruct/data/demos/manifest.json` records the source URL, publication DOI, retrieval date, archive member, raw-file SHA-256, normalized-sequence SHA-256 and illustration overrides.
+The studio includes five real published plasmid sequence files. Each is an unmodified member of a publicly downloadable archive. `src/auraconstruct/data/demos/manifest.json` records the source URL, publication DOI, retrieval date, archive member, raw-file SHA-256, normalized-sequence SHA-256 and illustration overrides.
 
 | Demo | Depositor / source | File source |
 | --- | --- | --- |
@@ -21,3 +21,5 @@ The source citation appears beside the canvas and on exported slides. Full sourc
 These scientific data files are separate from the MIT-licensed application code. The MYT and YSD 2.0 supplementary archives are labeled **CC BY-NC 4.0** in their Figshare metadata. Attribution and the license link are retained in the manifest. The public YTK ZIP does not state a separate data license inside its archive; its source terms apply. Bundling a demonstration file does not relicense it or grant rights to obtain or use the corresponding biological material.
 
 The random-DNA illustration fixture remains available for unit tests. It is no longer the interactive studio demo.
+
+Additional detailed examples: [pMYT075](https://www.addgene.org/180728/) and [pMYT095](https://www.addgene.org/198866/) come from the same MYT supplementary archive, with matching source metadata and checksums. See [detailed annotations](DETAILED_ANNOTATIONS.md).

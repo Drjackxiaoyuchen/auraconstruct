@@ -28,10 +28,12 @@ def load_demo(demo_id):
     c.provenance = {k:v for k,v in entry.items() if k not in ("display_overrides", "file")}
     for f in c.features:
         override = entry.get("display_overrides", {}).get(f.id, {})
-        for k in ("visible", "label", "module", "role"):
+        for k in ("visible", "label", "module", "role", "caption", "color"):
             if k in override:
                 setattr(f,k,override[k])
         if "role" in override:
             f.role_source = "demo-curated"
+        if "caption" in override:
+            f.caption_source = "demo-curated"
     c.warnings.append("Public sequence example. Original features are preserved; display curation and hidden details are recorded in the demo manifest.")
     return c

@@ -323,5 +323,192 @@
         "module": ""
       }
     }
+  },
+  {
+    "id": "myt075",
+    "title": "MYT / pMYT075 integration",
+    "plasmid": "pMYT075",
+    "file": "pMYT075.gb",
+    "source_url": "https://www.addgene.org/180728/",
+    "kit_url": "https://www.addgene.org/kits/ellis-myt/",
+    "download_url": "https://ndownloader.figshare.com/files/43054644",
+    "doi": "10.1021/acssynbio.3c00423",
+    "authors": "Shaw WM, Khalil AS, Ellis T",
+    "license": "CC BY-NC 4.0 (Figshare supplementary data)",
+    "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "display_citation": "Public demo: pMYT075 / Addgene #180728 / Shaw et al., 2023 / doi:10.1021/acssynbio.3c00423",
+    "archive_member": "MYT Plasmids/pMYT075.gb",
+    "file_sha256": "d9d43573948310b6c3aab49cb0309d3a32accbf69d742f6ef08de5f4a601d9e3",
+    "sequence_sha256": "fb554adbda093eec5ef657ddb77f37a2caace3efeae9b7794ffc12ee02b4c7cc",
+    "retrieved": "2026-11-12",
+    "length": 5651,
+    "display_overrides": {
+      "f1": {
+        "caption": "Int.1 donor homology arm. Positions refer to this plasmid.",
+        "color": "#6500FF",
+        "module": "Int.1 donor arms"
+      },
+      "f2": {
+        "caption": "Int.1 sequence barcode.",
+        "module": "Int.1 donor arms"
+      },
+      "f3": {
+        "caption": "Assembly primer binding region from the source annotation.",
+        "module": "Assembly junction"
+      },
+      "f4": {
+        "module": "Assembly junction"
+      },
+      "f5": {
+        "module": "mScarlet dropout region"
+      },
+      "f6": {
+        "module": "mScarlet dropout region"
+      },
+      "f7": {
+        "module": "mScarlet dropout region"
+      },
+      "f8": {
+        "module": "mScarlet dropout region"
+      },
+      "f9": {
+        "module": "mScarlet dropout region"
+      },
+      "f10": {
+        "module": "mScarlet dropout region"
+      },
+      "f11": {
+        "module": "mScarlet dropout region"
+      },
+      "f12": {
+        "module": "Assembly junction"
+      },
+      "f13": {
+        "caption": "Assembly primer binding region from the source annotation.",
+        "module": "Assembly junction"
+      },
+      "f14": {
+        "caption": "Int.1 sequence barcode.",
+        "module": "Int.1 donor arms"
+      },
+      "f15": {
+        "caption": "Int.1 donor homology arm. Positions refer to this plasmid.",
+        "color": "#6500FF",
+        "module": "Int.1 donor arms"
+      },
+      "f16": {
+        "module": "Bacterial backbone"
+      },
+      "f17": {
+        "module": "Bacterial backbone"
+      },
+      "f18": {
+        "module": "Bacterial backbone"
+      },
+      "f19": {
+        "module": "Bacterial backbone"
+      }
+    }
+  },
+  {
+    "id": "myt095",
+    "title": "MYT / pMYT095 Cas9 + gRNA",
+    "plasmid": "pMYT095",
+    "file": "pMYT095.gb",
+    "source_url": "https://www.addgene.org/198866/",
+    "kit_url": "https://www.addgene.org/kits/ellis-myt/",
+    "download_url": "https://ndownloader.figshare.com/files/43054644",
+    "doi": "10.1021/acssynbio.3c00423",
+    "authors": "Shaw WM, Khalil AS, Ellis T",
+    "license": "CC BY-NC 4.0 (Figshare supplementary data)",
+    "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "display_citation": "Public demo: pMYT095 / Addgene #198866 / Shaw et al., 2023 / doi:10.1021/acssynbio.3c00423",
+    "archive_member": "MYT Plasmids/pMYT095.gb",
+    "file_sha256": "09e6b2a09a11551dcafaea54dfd536e58fb289c7b954514bfdde9e70b5d08fa0",
+    "sequence_sha256": "39afcea6e625a59869ccbce1c37093bdcd521a2c86654bb10aca323db0477212",
+    "retrieved": "2026-11-12",
+    "length": 12866,
+    "display_overrides": {
+      "f1": {
+        "module": "Cas9 expression"
+      },
+      "f2": {
+        "caption": "Nuclear localization sequence in the Cas9 expression cassette.",
+        "module": "Cas9 expression"
+      },
+      "f3": {
+        "module": "Cas9 expression"
+      },
+      "f4": {
+        "caption": "Nuclear localization sequence in the Cas9 expression cassette.",
+        "module": "Cas9 expression"
+      },
+      "f5": {
+        "module": "Cas9 expression"
+      },
+      "f6": {
+        "module": "gRNA processing / dropout"
+      },
+      "f7": {
+        "caption": "tRNA region of the gRNA processing cassette.",
+        "module": "gRNA processing / dropout"
+      },
+      "f8": {
+        "module": "gRNA processing / dropout"
+      },
+      "f9": {
+        "module": "gRNA processing / dropout"
+      },
+      "f10": {
+        "module": "gRNA processing / dropout"
+      },
+      "f11": {
+        "module": "gRNA processing / dropout"
+      },
+      "f12": {
+        "caption": "Cas9 guide RNA scaffold.",
+        "module": "gRNA processing / dropout"
+      },
+      "f13": {
+        "caption": "tRNA region of the gRNA processing cassette.",
+        "module": "gRNA processing / dropout"
+      },
+      "f14": {
+        "module": "gRNA processing / dropout"
+      },
+      "f15": {
+        "module": "gRNA processing / dropout"
+      },
+      "f16": {
+        "module": "gRNA processing / dropout"
+      },
+      "f17": {
+        "module": "gRNA processing / dropout"
+      },
+      "f18": {
+        "module": "Yeast maintenance / selection"
+      },
+      "f19": {
+        "module": "Yeast maintenance / selection"
+      },
+      "f20": {
+        "module": "Yeast maintenance / selection"
+      },
+      "f21": {
+        "module": "Yeast maintenance / selection"
+      },
+      "f22": {
+        "module": "Yeast maintenance / selection"
+      },
+      "f23": {
+        "module": "Bacterial backbone"
+      },
+      "f24": {
+        "module": "Bacterial backbone"
+      },
+      "f25": {
+        "module": "Bacterial backbone"
+      }
+    }
   }
 ]

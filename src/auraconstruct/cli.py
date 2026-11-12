@@ -23,6 +23,7 @@ def main():
     export.add_argument("--layout",choices=["schematic","proportional"],default="schematic")
     export.add_argument("--palette",choices=["aureka","paper","colorblind","mono"],default="aureka")
     export.add_argument("--coordinates",action="store_true")
+    export.add_argument("--detail",choices=["overview","detailed"],default="detailed")
     export.add_argument("--annotate",choices=["plannotate"])
     export.add_argument("--reference",type=Path)
     export.add_argument("--topology",choices=["linear","circular"])
@@ -44,7 +45,7 @@ def main():
                 if args.annotate:
                     c=plannotate(c)
                 constructs.append(c)
-        pages=[p for c in constructs for p in build_pages(c,args.layout,args.palette,args.coordinates)]
+        pages=[p for c in constructs for p in build_pages(c,args.layout,args.palette,args.coordinates,detail=args.detail)]
         out=args.output
         out.parent.mkdir(parents=True,exist_ok=True)
         if out.suffix.lower()==".pptx":

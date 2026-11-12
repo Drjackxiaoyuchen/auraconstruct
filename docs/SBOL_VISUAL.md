@@ -18,6 +18,10 @@ This release independently implements a subset of sequence-feature glyphs as nat
 | ncrna | Box with a wavy top | `ncRNA`, `tRNA`, `rRNA` |
 | polya | `AAA` at the site | `polyA_site`, `polyA_signal` |
 | generic | Diamond with question mark | Other or unknown feature types |
+| region | Unspecified halfround rectangle | Annotated homology arms, barcodes, tags, linkers and assembly connectors |
+| engineered_region | Plain rectangle | Explicit engineered region, SO:0000804 |
+| spacer | Circle with X | Explicit inert DNA spacer, SO:0002223 |
+| nuclease_site | X atop a DNA stem | Explicit nuclease site annotation |
 
 Reverse-strand directional glyphs rotate 180 degrees about the DNA backbone. Labels remain upright. Strand-unknown directional features carry a small question mark. Joined features appear once in the schematic and as separate interval segments in coordinate mode. Per-segment strands remain in project JSON and GenBank output.
 
