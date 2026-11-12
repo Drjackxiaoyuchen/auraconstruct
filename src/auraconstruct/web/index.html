@@ -1,17 +1,17 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AuraConstruct · DNA illustration studio</title><link rel="stylesheet" href="/static/style.css"><script defer src="/static/app.js"></script></head>
 <body>
-<header class="topbar"><a class="brand" href="/"><span class="brand-mark">a</span>AuraConstruct<span class="edition">ILLUSTRATION STUDIO</span></a><div class="top-actions"><span class="local"><i></i>Local workspace</span><button id="saveProject" class="quiet">Save project</button><label class="quiet button" for="projectInput">Open project</label><input id="projectInput" type="file" accept=".json" hidden></div></header>
+<header class="topbar"><a class="brand" href="/"><img class="brand-logo" src="/static/assets/aureka-logo.png" alt="Aureka"><span class="product-name">AuraConstruct</span><span class="edition">ILLUSTRATION STUDIO</span></a><div class="top-actions"><span class="local"><i></i>Local workspace</span><button id="saveProject" class="quiet">Save project</button><label class="quiet button" for="projectInput">Open project</label><input id="projectInput" type="file" accept=".json" hidden></div></header>
 <div class="workspace">
 <aside>
 <div class="section-label">01 / SEQUENCE</div><h1>Give your DNA<br>a clear visual language.</h1><p class="intro">Build presentation figures from sequence annotations. Keep every part editable.</p>
 <label class="dropzone" id="dropzone" for="fileInput"><span class="upload-symbol">＋</span><strong>Drop sequence files</strong><span>or click to browse</span><small>GenBank · SnapGene · FASTA · EMBL · DNA text</small></label><input id="fileInput" type="file" accept=".gb,.gbk,.genbank,.dna,.fa,.fas,.fasta,.fna,.embl,.txt,.seq,.gz" multiple hidden>
-<button class="demo" id="loadDemo">Explore an example <span>↗</span></button>
+<label class="field-label" for="demoSelect">Public toolkit examples</label><select id="demoSelect"><option value="ytk001">YTK / pYTK001</option><option value="myt001">MYT / pMYT001</option><option value="ysd891">YSD 2.0 / pYSD891</option></select><button class="demo" id="loadDemo">Load public example <span>↗</span></button>
 <label class="field-label" for="recordSelect">Construct</label><select id="recordSelect" disabled><option>Import a sequence to begin</option></select>
 <label class="field-label" for="topology">Topology</label><select id="topology"><option value="unknown">Unknown</option><option value="circular">Circular</option><option value="linear">Linear</option></select>
 <div class="section-label space">02 / FIGURE</div>
 <label class="field-label" for="layout">View</label><div class="segmented"><button data-layout="schematic" class="active">Schematic</button><button data-layout="proportional">Coordinates</button></div>
-<label class="field-label" for="palette">Color palette</label><select id="palette"><option value="paper">Paper / muted color</option><option value="colorblind">Colorblind friendly</option><option value="mono">Monochrome</option></select>
+<label class="field-label" for="palette">Color palette</label><select id="palette"><option value="aureka">Aureka / purple & gold</option><option value="paper">Paper / muted color</option><option value="colorblind">Colorblind friendly</option><option value="mono">Monochrome</option></select>
 <label class="check"><input id="coordinates" type="checkbox"> Show feature coordinates</label>
 <div class="section-label space">03 / ANNOTATION</div><p class="side-note">Keep existing annotations or add predictions from a local reference or pLannotate.</p><label class="secondary button" for="referenceInput">Match reference parts</label><input id="referenceInput" type="file" accept=".gb,.gbk,.fa,.fasta,.dna,.embl" hidden><button class="secondary" id="plannotate">Run pLannotate</button><small id="annotationStatus" class="status-note">Checking local annotation engine…</small>
 <a class="source-link" href="https://sbolstandard.org/visual-glyphs/" target="_blank" rel="noreferrer">SBOL Visual glyph reference ↗</a>
@@ -19,6 +19,7 @@
 <main>
 <div class="main-heading"><div><div class="section-label">CONSTRUCT CANVAS</div><h2 id="figureTitle">Your next construct figure</h2><p id="meta">Sequence-grounded diagrams, ready for your presentation.</p></div><div class="export-actions"><button id="exportSvg" class="secondary">SVG</button><button id="exportPptx" class="primary">Export PowerPoint <span>↗</span></button></div></div>
 <div id="notification" role="status" hidden></div>
+<div id="sequenceSource" class="sequence-source" hidden></div>
 <div class="canvas-toolbar"><div class="canvas-tabs"><span id="viewLabel">Schematic view</span><span class="subtle">16:9 canvas</span></div><div class="page-controls"><button id="prevPage" aria-label="Previous page">←</button><span id="pageInfo">1 / 1</span><button id="nextPage" aria-label="Next page">→</button></div></div>
 <div class="canvas-wrap"><div id="canvas" class="canvas"><div class="empty"><span class="empty-line"></span><h3>A place for your genetic story</h3><p>Import a sequence or explore the example to begin.</p></div></div></div>
 <div class="canvas-caption"><span id="figureCaption">Native glyphs and text remain editable in PowerPoint.</span><label class="check"><input id="allRecords" type="checkbox"> Export all constructs</label></div>

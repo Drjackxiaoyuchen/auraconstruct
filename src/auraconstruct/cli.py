@@ -21,7 +21,7 @@ def main():
     export.add_argument("inputs",nargs="+",type=Path)
     export.add_argument("-o","--output",type=Path,required=True)
     export.add_argument("--layout",choices=["schematic","proportional"],default="schematic")
-    export.add_argument("--palette",choices=["paper","colorblind","mono"],default="paper")
+    export.add_argument("--palette",choices=["aureka","paper","colorblind","mono"],default="aureka")
     export.add_argument("--coordinates",action="store_true")
     export.add_argument("--annotate",choices=["plannotate"])
     export.add_argument("--reference",type=Path)

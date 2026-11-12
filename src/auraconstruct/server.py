@@ -13,7 +13,7 @@ from . import __version__
 from .annotate import exact_annotate, plannotate, plannotate_available
 from .model import ROLES
 from .sequence_io import read_bytes, from_dict, to_genbank
-from .scene import build_pages, to_svg
+from .scene import build_pages, to_svg, PALETTES, COLORS
 from .pptx import to_pptx
 
 ROOT = Path(__file__).parent
@@ -52,11 +52,14 @@ def create_app():
 
     @app.get("/api/status")
     def status():
-        return jsonify(version=__version__, plannotate=plannotate_available(), roles=ROLES)
+        from .demos import catalog
+        return jsonify(version=__version__, plannotate=plannotate_available(), roles=ROLES,
+                       palettes=PALETTES, role_color_indices=COLORS, demos=catalog())
 
     @app.get("/api/demo")
     def demo():
-        return jsonify(records=[c.to_dict() for c in read_bytes((ROOT/"data"/"illustration_demo.gb").read_bytes(), "illustration_demo.gb")])
+        from .demos import load_demo
+        return jsonify(records=[load_demo(request.args.get("id", "ytk001")).to_dict()])
 
     @app.post("/api/import")
     def import_sequence():

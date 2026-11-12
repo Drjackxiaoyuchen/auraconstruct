@@ -119,7 +119,8 @@ def test_native_groups_editable_text_no_raster_and_notes():
     c=sample();c.features[0].label='Label {x} & <editable>'
     data=to_pptx(build_pages(c))
     with ZipFile(io.BytesIO(data)) as z:
-        assert not any(n.startswith("ppt/media/") for n in z.namelist())
+        # Only the original brand wordmark is an image. Construct glyphs remain native.
+        assert [n for n in z.namelist() if n.startswith("ppt/media/")] == ["ppt/media/aureka-logo.png"]
         for name in z.namelist():
             if name.endswith((".xml",".rels")):ET.fromstring(z.read(name))
         root=ET.fromstring(z.read("ppt/slides/slide1.xml"))
@@ -184,3 +185,24 @@ def test_plannotate_adapter_merges_and_preserves_imports(monkeypatch):
     assert len(result.features)==len(c.features)+1
     assert result.features[-1].source=='pLannotate-prediction'
     assert result.sequence==c.sequence
+
+
+@pytest.mark.parametrize("demo_id",["ytk001","myt001","ysd891"])
+def test_public_demo_provenance_and_export(demo_id):
+    import hashlib
+    from auraconstruct.demos import load_demo
+    c=load_demo(demo_id)
+    assert hashlib.sha256(c.sequence.encode()).hexdigest()==c.provenance["sequence_sha256"]
+    assert c.length==c.provenance["length"]
+    assert c.provenance["source_url"].startswith("https://www.addgene.org/")
+    assert from_dict(c.to_dict()).provenance==c.provenance
+    for layout in ("schematic","proportional"):
+        pages=build_pages(c,layout=layout)
+        with ZipFile(io.BytesIO(to_pptx(pages))) as z:
+            for i in range(len(pages)):
+                notes=z.read(f"ppt/notesSlides/notesSlide{i+1}.xml").decode()
+                assert c.provenance["doi"] in notes
+            assert b'6500FF' in z.read('ppt/theme/theme1.xml')
+    response=create_app().test_client().get(f'/api/demo?id={demo_id}')
+    assert response.status_code==200
+    assert response.json['records'][0]['sha256']==c.to_dict()['sha256']

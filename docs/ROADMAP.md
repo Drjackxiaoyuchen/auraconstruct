@@ -1,6 +1,6 @@
 # Roadmap
 
-The current deliverable is a working local v0.1 illustration tool. These items are future work, not completed capabilities.
+The current deliverable is a working local v0.2 illustration tool. These items are future work, not completed capabilities.
 
 ## Figure composition
 

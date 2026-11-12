@@ -19,3 +19,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Third-party public sequence files in src/auraconstruct/data/demos are governed
+by their source data terms, recorded in manifest.json and docs/PUBLIC_DEMOS.md.
+The Aureka wordmark is owner-supplied branding and is not relicensed by the MIT
+software license. See docs/AUREKA_STYLE.md.

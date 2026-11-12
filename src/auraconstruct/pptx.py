@@ -13,6 +13,7 @@ from itertools import count
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from .scene import W, H
+from .brand import LOGO
 
 EMU = 9525  # CSS pixel at 96 dpi
 A = "http://schemas.openxmlformats.org/drawingml/2006/main"
@@ -43,6 +44,11 @@ def xfrm(x, y, w, h, group=False):
 
 def shape(item, sid):
     name = escape(item.name or item.kind, quote=True)
+    if item.kind == "image":
+        return (f'<p:pic><p:nvPicPr><p:cNvPr id="{sid}" name="{name}"/>'
+                '<p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr>'
+                '<p:blipFill><a:blip r:embed="rIdLogo"/><a:stretch><a:fillRect/></a:stretch></p:blipFill>'
+                f'<p:spPr>{xfrm(item.x,item.y,item.w,item.h)}<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr></p:pic>')
     nv = f'<p:nvSpPr><p:cNvPr id="{sid}" name="{name}"/><p:cNvSpPr'+(' txBox="1"' if item.kind=="text" else '')+'/>'+ '<p:nvPr/></p:nvSpPr>'
     pos = xfrm(item.x,item.y,item.w,item.h)
     if item.kind == "text":
@@ -84,9 +90,9 @@ def sp_tree(items):
     return ''.join(parts)+'</p:spTree>'
 
 
-THEME = f'''<a:theme xmlns:a="{A}" name="AuraConstruct"><a:themeElements><a:clrScheme name="Paper">
-<a:dk1><a:srgbClr val="222C37"/></a:dk1><a:lt1><a:srgbClr val="FFFFFF"/></a:lt1><a:dk2><a:srgbClr val="697582"/></a:dk2><a:lt2><a:srgbClr val="F4F6F8"/></a:lt2>
-<a:accent1><a:srgbClr val="247C80"/></a:accent1><a:accent2><a:srgbClr val="D9A83A"/></a:accent2><a:accent3><a:srgbClr val="4678B2"/></a:accent3><a:accent4><a:srgbClr val="C66358"/></a:accent4><a:accent5><a:srgbClr val="8A79A8"/></a:accent5><a:accent6><a:srgbClr val="63856C"/></a:accent6><a:hlink><a:srgbClr val="0072B2"/></a:hlink><a:folHlink><a:srgbClr val="8A79A8"/></a:folHlink></a:clrScheme>
+THEME = f'''<a:theme xmlns:a="{A}" name="Aureka 2026"><a:themeElements><a:clrScheme name="Aureka">
+<a:dk1><a:srgbClr val="333333"/></a:dk1><a:lt1><a:srgbClr val="FFFFFF"/></a:lt1><a:dk2><a:srgbClr val="707684"/></a:dk2><a:lt2><a:srgbClr val="F0EAFF"/></a:lt2>
+<a:accent1><a:srgbClr val="6500FF"/></a:accent1><a:accent2><a:srgbClr val="FF6D8E"/></a:accent2><a:accent3><a:srgbClr val="4200AC"/></a:accent3><a:accent4><a:srgbClr val="F9AC2F"/></a:accent4><a:accent5><a:srgbClr val="6FC0A9"/></a:accent5><a:accent6><a:srgbClr val="FFBFDF"/></a:accent6><a:hlink><a:srgbClr val="6500FF"/></a:hlink><a:folHlink><a:srgbClr val="4200AC"/></a:folHlink></a:clrScheme>
 <a:fontScheme name="Arial"><a:majorFont><a:latin typeface="Arial"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont><a:minorFont><a:latin typeface="Arial"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont></a:fontScheme>
 <a:fmtScheme name="Standard"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:fillStyleLst><a:lnStyleLst>
 {''.join('<a:ln w="9525"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln>' for _ in range(3))}</a:lnStyleLst><a:effectStyleLst>{'<a:effectStyle><a:effectLst/></a:effectStyle>'*3}</a:effectStyleLst><a:bgFillStyleLst>{'<a:solidFill><a:schemeClr val="phClr"/></a:solidFill>'*3}</a:bgFillStyleLst></a:fmtScheme></a:themeElements></a:theme>'''
@@ -107,7 +113,8 @@ def to_pptx(pages) -> bytes:
         for i in range(1,len(pages)+1):
             overrides += [(f"/ppt/slides/slide{i}.xml","presentationml.slide"),(f"/ppt/notesSlides/notesSlide{i}.xml","presentationml.notesSlide")]
         types = ''.join(f'<Override PartName="{p}" ContentType="application/vnd.openxmlformats-officedocument.{t}+xml"/>' for p,t in overrides)
-        put("[Content_Types].xml",'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>'+types+'</Types>')
+        put("[Content_Types].xml",'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/>'+types+'</Types>')
+        z.writestr("ppt/media/aureka-logo.png", LOGO.read_bytes())
         z.writestr("_rels/.rels",rels([("rId1","officeDocument","ppt/presentation.xml")]))
         slideids = ''.join(f'<p:sldId id="{255+i}" r:id="rId{i+2}"/>' for i in range(1,len(pages)+1))
         put("ppt/presentation.xml",f'<p:presentation {NS}><p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst><p:notesMasterIdLst><p:notesMasterId r:id="rId2"/></p:notesMasterIdLst><p:sldIdLst>{slideids}</p:sldIdLst><p:sldSz cx="{W*EMU}" cy="{H*EMU}" type="screen16x9"/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>')
@@ -122,7 +129,7 @@ def to_pptx(pages) -> bytes:
         z.writestr("ppt/notesMasters/_rels/notesMaster1.xml.rels",rels([("rId1","theme","../theme/theme1.xml")]))
         for i,p in enumerate(pages,1):
             put(f"ppt/slides/slide{i}.xml",f'<p:sld {NS}><p:cSld name="{escape(p.title,quote=True)}"><p:bg><p:bgPr><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>{sp_tree(p.items)}</p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>')
-            z.writestr(f"ppt/slides/_rels/slide{i}.xml.rels",rels([("rId1","slideLayout","../slideLayouts/slideLayout1.xml"),("rId2","notesSlide",f"../notesSlides/notesSlide{i}.xml")]))
+            z.writestr(f"ppt/slides/_rels/slide{i}.xml.rels",rels([("rId1","slideLayout","../slideLayouts/slideLayout1.xml"),("rId2","notesSlide",f"../notesSlides/notesSlide{i}.xml"),("rIdLogo","image","../media/aureka-logo.png")]))
             paragraphs = ''.join(f'<a:p><a:r><a:rPr lang="en-US"/><a:t>{escape(line)}</a:t></a:r></a:p>' for line in p.notes.splitlines())
             put(f"ppt/notesSlides/notesSlide{i}.xml",f'<p:notes {NS}><p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr/><p:sp><p:nvSpPr><p:cNvPr id="2" name="Notes"/><p:cNvSpPr/><p:nvPr><p:ph type="body" idx="1"/></p:nvPr></p:nvSpPr><p:spPr/><p:txBody><a:bodyPr/><a:lstStyle/>{paragraphs}</p:txBody></p:sp></p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:notes>')
             z.writestr(f"ppt/notesSlides/_rels/notesSlide{i}.xml.rels",rels([("rId1","slide",f"../slides/slide{i}.xml"),("rId2","notesMaster","../notesMasters/notesMaster1.xml")]))

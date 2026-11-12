@@ -1,8 +1,10 @@
 /* No external scripts, analytics, sequence storage, or remote annotation calls. */
 const $=id=>document.getElementById(id);
-const state={records:[],index:0,pages:[],page:0,options:{layout:'schematic',palette:'paper',coordinates:false}};
+const state={records:[],index:0,pages:[],page:0,options:{layout:'schematic',palette:'aureka',coordinates:false}};
 const roles={promoter:'Promoter',rbs:'Ribosome entry site',cds:'Coding sequence',terminator:'Terminator',origin:'Replication origin',operator:'Operator',primer:'Primer binding site',scar:'Assembly scar',ncrna:'Non-coding RNA',recombination:'Recombination site',polya:'PolyA site',generic:'Unspecified'};
-const roleColors={promoter:'#247c80',rbs:'#d9a83a',cds:'#4678b2',terminator:'#c66358',origin:'#8a79a8',operator:'#63856c',generic:'#758394'};
+let palettes={aureka:['#4200AC','#F9AC2F','#6500FF','#FF6D8E','#6FC0A9','#8882BE','#555656']};
+let roleColorIndices={promoter:0,rbs:1,cds:2,terminator:3,origin:4,operator:5,generic:6};
+function defaultColor(role){return (palettes[state.options.palette]||palettes.aureka)[roleColorIndices[role]??6];}
 const headers={'X-AuraConstruct':'1'};
 let renderTimer,renderVersion=0;
 const current=()=>state.records[state.index];
@@ -21,6 +23,8 @@ function selectRecord(index){
   $('figureTitle').textContent=c.name;
   $('meta').textContent=`${c.length.toLocaleString()} bp / ${c.topology} / ${c.source_format} / ${c.source_name}`;
   $('topology').value=c.topology;
+  const source=$('sequenceSource');source.replaceChildren();source.hidden=!c.provenance?.source_url;
+  if(!source.hidden){const link=document.createElement('a');link.textContent=c.provenance.display_citation||'Public sequence source';if(/^https:\/\//.test(c.provenance.source_url))link.href=c.provenance.source_url;link.target='_blank';link.rel='noreferrer';source.append(link);}
   $('featureSearch').value='';updateTable();scheduleRender();
   $('warnings').replaceChildren(...c.warnings.map(w=>{const p=document.createElement('p');p.textContent=w;return p;}));
 }
@@ -62,7 +66,7 @@ function updateTable(){
     for(const [role,name] of Object.entries(roles)){glyph.add(new Option(name,role));}glyph.value=f.role;
     glyph.addEventListener('change',()=>{f.role=glyph.value;f.role_source='user-assigned';scheduleRender();updateTable();});row.append(td(glyph));
     const pos=document.createElement('span');pos.className='position';pos.textContent=f.segments.map(([a,b])=>`${a+1}..${b}`).join(', ')+` / ${f.strand===1?'+':f.strand===-1?'−':'?'}`+(f.fuzzy?' ≈':'');row.append(td(pos));
-    const color=document.createElement('input');color.type='color';color.value=f.color||roleColors[f.role]||'#758394';color.setAttribute('aria-label',`Color for ${f.label}`);color.addEventListener('input',()=>{f.color=color.value;scheduleRender();});row.append(td(color));
+    const color=document.createElement('input');color.type='color';color.value=f.color||defaultColor(f.role);color.setAttribute('aria-label',`Color for ${f.label}`);color.addEventListener('input',()=>{f.color=color.value;scheduleRender();});row.append(td(color));
     const module=input(f.module,v=>{f.module=v;scheduleRender();},'No module');module.maxLength=100;module.setAttribute('aria-label','Module name');row.append(td(module));
     const evidence=document.createElement('span');evidence.className='evidence'+(f.role_source==='label-heuristic'?' heuristic':'');evidence.textContent=`${f.source} / ${f.role_source}`;evidence.title=`Original type: ${f.type}\n${JSON.stringify(f.qualifiers,null,2)}`;row.append(td(evidence));return row;
   });
@@ -85,7 +89,7 @@ async function exportFile(fmt){
   const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   notice(fmt==='pptx'?'PowerPoint exported. Select a part group, then Ungroup to edit its individual strokes and label.':'Export ready.');
 }
-$('loadDemo').addEventListener('click',guarded(async()=>{const res=await fetch('/api/demo');const data=await res.json();setRecords(data.records);notice('Illustration example: random DNA with schematic annotations. These are not functional part sequences.');}));
+$('loadDemo').addEventListener('click',guarded(async()=>{const res=await fetch(`/api/demo?id=${encodeURIComponent($('demoSelect').value)}`);if(!res.ok)throw Error((await res.json()).error);const data=await res.json();setRecords(data.records);notice('Public toolkit plasmid loaded. Review the source annotation and display choices before exporting.');}));
 $('fileInput').addEventListener('change',guarded(e=>importFiles([...e.target.files])));
 const drop=$('dropzone');for(const name of ['dragenter','dragover'])drop.addEventListener(name,e=>{e.preventDefault();drop.classList.add('drag');});
 for(const name of ['dragleave','drop'])drop.addEventListener(name,e=>{e.preventDefault();drop.classList.remove('drag');});
@@ -93,7 +97,7 @@ drop.addEventListener('drop',guarded(e=>importFiles([...e.dataTransfer.files])))
 $('recordSelect').addEventListener('change',e=>selectRecord(Number(e.target.value)));
 $('topology').addEventListener('change',()=>{if(current()){current().topology=$('topology').value;selectRecord(state.index);}});
 for(const button of document.querySelectorAll('[data-layout]'))button.addEventListener('click',()=>{state.options.layout=button.dataset.layout;for(const b of document.querySelectorAll('[data-layout]'))b.classList.toggle('active',b===button);scheduleRender();});
-$('palette').addEventListener('change',()=>{state.options.palette=$('palette').value;scheduleRender();});
+$('palette').addEventListener('change',()=>{state.options.palette=$('palette').value;updateTable();scheduleRender();});
 $('coordinates').addEventListener('change',()=>{state.options.coordinates=$('coordinates').checked;scheduleRender();});
 $('prevPage').addEventListener('click',()=>{if(state.page>0){state.page--;showPage();}});
 $('nextPage').addEventListener('click',()=>{if(state.page<state.pages.length-1){state.page++;showPage();}});
@@ -128,4 +132,4 @@ $('featureForm').addEventListener('submit',guarded(async e=>{
   current().features.push({id:`user-${crypto.randomUUID()}`,label:v.label,type:'misc_feature',role:v.role,segments:[[a,b]],strand:Number(v.strand),source:'user-added',role_source:'user-assigned',qualifiers:{},color:null,visible:true,module:'',fuzzy:false});
   updateTable();scheduleRender();$('addDialog').close();e.target.reset();
 }));
-guarded(async()=>{const res=await fetch('/api/status');const s=await res.json();$('version').textContent=`v${s.version}`;$('plannotate').disabled=!s.plannotate;$('annotationStatus').textContent=s.plannotate?'pLannotate found locally. Database readiness is checked when run.':'pLannotate is optional and not installed. Exact reference matching is ready.';})();
+guarded(async()=>{const res=await fetch('/api/status');const s=await res.json();palettes=s.palettes||palettes;roleColorIndices=s.role_color_indices||roleColorIndices;$('version').textContent=`v${s.version}`;$('plannotate').disabled=!s.plannotate;$('annotationStatus').textContent=s.plannotate?'pLannotate found locally. Database readiness is checked when run.':'pLannotate is optional and not installed. Exact reference matching is ready.';})();

@@ -21,15 +21,15 @@ auraconstruct serve
 
 Open [the local studio](http://127.0.0.1:8741). On macOS, `launch.command` starts the same app and sets up the environment on first launch. The interface has no external fonts, analytics, or remote sequence services. Uploaded sequences stay in local browser/server memory until you export or close the session. Saved project JSON and GenBank exports include the DNA sequence.
 
-1. Drop one or more files, or choose **Explore an example**.
+1. Drop one or more files, or select a public toolkit plasmid and choose **Load public example**.
 2. Review the feature table. Edit labels, roles, colors, module names, and visibility.
 3. Choose **Schematic** for a presentation or **Coordinates** to check positions.
 4. Export **PowerPoint**. Select a named feature group and ungroup it to edit individual glyph strokes or text. Copy groups into your own deck.
 5. **Save project** preserves all loaded constructs and illustration settings. **Open project** restores them. **Export all constructs** combines figures into one PPTX.
 
-The bundled example uses random DNA and illustrative annotations. It does **not** contain functional sequences for the labeled parts.
+The studio includes real public **YTK pYTK001**, **MYT pMYT001**, and **YSD 2.0 pYSD891** examples, with source links, checksums and recorded display curation. The random-DNA fixture remains for tests. See [public demo provenance and data licenses](docs/PUBLIC_DEMOS.md).
 
-## What works in v0.1
+## What works in v0.2
 
 | Area | Support |
 | --- | --- |
@@ -37,11 +37,15 @@ The bundled example uses random DNA and illustrative annotations. It does **not*
 | Multiple records | Multiple files and multiple GenBank/FASTA records |
 | Locations | Forward/reverse strands, joined segments, circular-origin crossings, per-segment strands; fuzzy locations retain their original location string |
 | Annotation | Existing features; exact matches against user reference FASTA/GenBank/SnapGene/EMBL; optional local pLannotate |
-| Illustration | SBOL Visual sequence-feature glyph subset, module brackets, paper/colorblind/monochrome palettes, pagination, feature hiding |
+| Illustration | SBOL Visual sequence-feature glyph subset, module brackets, Aureka/paper/colorblind/monochrome palettes, pagination, feature hiding |
 | Export | Native editable PPTX, SVG or a ZIP of SVG pages, annotated GenBank, project JSON |
 | Automation | CLI and a documented local HTTP API |
 
 Features include promoters, ribosome entry sites, CDSs, terminators, origins, operators, primer sites, assembly scars, recombination sites, non-coding RNA, polyA sites, and unspecified features. See [glyph semantics](docs/SBOL_VISUAL.md).
+
+## Aureka appearance
+
+New sessions and CLI exports use Aureka’s 2026 purple, yellow, mint and pink palette, Arial typography, white scientific canvas, and original wordmark. The exported PPTX theme carries the same accent colors. [Style reference](docs/AUREKA_STYLE.md).
 
 ## Annotation
 
@@ -63,6 +67,8 @@ auraconstruct export annotated.gb -o coordinates.pptx --layout proportional
 ```
 
 For multiple SVG pages, the CLI writes numbered SVG files. The browser app downloads a ZIP. Proportional mode places exact colored interval tracks on a shared bp axis; glyph widths have readability limits. In schematic mode, part order follows sequence coordinates and lengths are not to scale. Lanes in coordinate mode separate overlapping features on the same DNA molecule.
+
+[Editable public demo examples](examples/AuraConstruct_Aureka_Public_Demos.pptx) combine the YTK, MYT and YSD 2.0 figures.
 
 ## Design references
 
@@ -88,6 +94,7 @@ The useful gap is the editable PPTX workflow. The projects reviewed document str
 ```bash
 pip install -e '.[dev]'
 pytest -q
+python scripts/build_examples.py
 ```
 
 Tests exercise real binary SnapGene packets, coordinate round trips, joined features, both-strand matching, native PPTX paths/groups/text, package relationships, pagination and the HTTP workflow. CI covers Python 3.10, 3.12 and 3.13. Local validation additionally parsed and exported 96 workspace MYT GenBank files containing 1,011 features; these source files are not included in the repository.

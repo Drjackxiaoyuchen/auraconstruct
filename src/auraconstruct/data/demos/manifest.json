@@ -1,0 +1,327 @@
+[
+  {
+    "id": "ytk001",
+    "title": "YTK / pYTK001",
+    "plasmid": "pYTK001",
+    "file": "pYTK001.gb",
+    "source_url": "https://www.addgene.org/65108/",
+    "kit_url": "https://www.addgene.org/kits/moclo-ytk/",
+    "download_url": "https://media.addgene.org/cms/filer_public/4d/26/4d26f69c-1b8e-4473-8494-a7e993618112/ytk_genbank_files.zip",
+    "doi": "10.1021/sb500366v",
+    "authors": "Lee ME, DeLoache WC, Cervantes B, Dueber JE",
+    "license": "Source terms apply; no separate license specified in the Addgene ZIP",
+    "display_citation": "Public demo: pYTK001 / Addgene #65108 / Lee et al., 2015 / doi:10.1021/sb500366v",
+    "archive_member": "plasmids/pYTK001.gb",
+    "file_sha256": "5d059abff8bb7343eeec012fd4a5fccb45c3f3ee40354d5d37995064cce41871",
+    "sequence_sha256": "7809cf56f99552890ea4e0f261444a2e5009f67f6209fc8239ed16e34c357341",
+    "retrieved": "2026-11-12",
+    "length": 2676,
+    "display_overrides": {
+      "f1": {
+        "module": "Bacterial backbone",
+        "label": "CamR terminator"
+      },
+      "f2": {
+        "module": "Bacterial backbone"
+      },
+      "f3": {
+        "module": "Bacterial backbone"
+      },
+      "f4": {
+        "module": "Bacterial backbone",
+        "label": "CamR promoter"
+      },
+      "f5": {
+        "module": "GFP dropout cassette",
+        "label": "GlpT promoter"
+      },
+      "f6": {
+        "module": "GFP dropout cassette",
+        "label": "sfGFP RBS"
+      },
+      "f7": {
+        "module": "GFP dropout cassette"
+      },
+      "f8": {
+        "module": "GFP dropout cassette",
+        "label": "B0015 terminator"
+      },
+      "f9": {
+        "visible": false,
+        "module": "GFP dropout cassette"
+      },
+      "f10": {
+        "visible": false,
+        "module": "GFP dropout cassette"
+      }
+    }
+  },
+  {
+    "id": "myt001",
+    "title": "MYT / pMYT001",
+    "plasmid": "pMYT001",
+    "file": "pMYT001.gb",
+    "source_url": "https://www.addgene.org/180654/",
+    "kit_url": "https://www.addgene.org/kits/ellis-myt/",
+    "download_url": "https://ndownloader.figshare.com/files/43054644",
+    "doi": "10.1021/acssynbio.3c00423",
+    "authors": "Shaw WM, Khalil AS, Ellis T",
+    "license": "CC BY-NC 4.0 (Figshare supplementary data)",
+    "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "display_citation": "Public demo: pMYT001 / Addgene #180654 / Shaw et al., 2023 / doi:10.1021/acssynbio.3c00423",
+    "archive_member": "MYT Plasmids/pMYT001.gb",
+    "file_sha256": "d0d9c37487de220f4357d21d810d7352834b546233178df6799c8539da0d45fe",
+    "sequence_sha256": "4cc65b8e419683fc89ab72a02172c0f3ba00be56863d168fa96d0863c9e189e7",
+    "retrieved": "2026-11-12",
+    "length": 2223,
+    "display_overrides": {
+      "f1": {
+        "module": "pZ3 regulatory insert"
+      },
+      "f2": {
+        "module": "pZ3 regulatory insert",
+        "role": "operator"
+      },
+      "f3": {
+        "module": "pZ3 regulatory insert",
+        "role": "operator"
+      },
+      "f4": {
+        "module": "pZ3 regulatory insert",
+        "role": "operator"
+      },
+      "f5": {
+        "module": "pZ3 regulatory insert",
+        "role": "operator"
+      },
+      "f6": {
+        "module": "pZ3 regulatory insert",
+        "role": "operator"
+      },
+      "f7": {
+        "module": "pZ3 regulatory insert",
+        "role": "operator"
+      },
+      "f8": {
+        "module": "pZ3 regulatory insert"
+      },
+      "f9": {
+        "module": "Bacterial backbone"
+      },
+      "f10": {
+        "module": "Bacterial backbone",
+        "role": "cds"
+      },
+      "f11": {
+        "module": "Bacterial backbone"
+      },
+      "f12": {
+        "module": "Bacterial backbone"
+      }
+    }
+  },
+  {
+    "id": "ysd891",
+    "title": "YSD 2.0 / pYSD891",
+    "plasmid": "pYSD891",
+    "file": "pYSD891.gb",
+    "source_url": "https://www.addgene.org/253017/",
+    "kit_url": "https://www.addgene.org/kits/young-moclo-ysd2/",
+    "download_url": "https://ndownloader.figshare.com/files/63969812",
+    "doi": "10.1021/acssynbio.6c00085",
+    "authors": "Juric V, Erwin LG, O'Riordan NM, Maher E, Holmes JD, Young PW",
+    "license": "CC BY-NC 4.0 (Figshare supplementary data)",
+    "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "display_citation": "Public demo: pYSD891 / Addgene #253017 / Juric et al., 2026 / doi:10.1021/acssynbio.6c00085",
+    "archive_member": "pYSD891  pYTK083-pYTK003-pYTK013-pYSD078  GFP-DropOut Type 3-pYSD089  Linker-FLAG-TEV-649-stalk anchor-pYTK066-pYTK068-pYTK075-pYTK081.gb",
+    "file_sha256": "2f89e8375a911b6b75321ca0bb5c0ccd9e50ac3d54463b8559ca96dbd3da78b9",
+    "sequence_sha256": "9aa2a9db9cbbdc4157bbabe61540027546d380566cbfab5519a720a7168ec606",
+    "retrieved": "2026-11-12",
+    "length": 8816,
+    "display_overrides": {
+      "f1": {
+        "visible": false,
+        "module": ""
+      },
+      "f2": {
+        "visible": false,
+        "module": ""
+      },
+      "f3": {
+        "module": ""
+      },
+      "f4": {
+        "module": ""
+      },
+      "f5": {
+        "module": ""
+      },
+      "f6": {
+        "module": ""
+      },
+      "f7": {
+        "visible": false,
+        "module": ""
+      },
+      "f8": {
+        "visible": false,
+        "module": ""
+      },
+      "f9": {
+        "visible": false,
+        "module": ""
+      },
+      "f10": {
+        "visible": false,
+        "module": ""
+      },
+      "f11": {
+        "visible": false,
+        "module": ""
+      },
+      "f12": {
+        "visible": false,
+        "module": ""
+      },
+      "f13": {
+        "visible": false,
+        "module": ""
+      },
+      "f14": {
+        "visible": false,
+        "module": ""
+      },
+      "f15": {
+        "module": ""
+      },
+      "f16": {
+        "visible": false,
+        "module": ""
+      },
+      "f17": {
+        "module": ""
+      },
+      "f18": {
+        "module": ""
+      },
+      "f19": {
+        "module": ""
+      },
+      "f20": {
+        "module": ""
+      },
+      "f21": {
+        "module": ""
+      },
+      "f22": {
+        "visible": false,
+        "module": ""
+      },
+      "f23": {
+        "module": ""
+      },
+      "f24": {
+        "module": ""
+      },
+      "f25": {
+        "visible": false,
+        "module": ""
+      },
+      "f26": {
+        "visible": false,
+        "module": ""
+      },
+      "f27": {
+        "visible": false,
+        "module": ""
+      },
+      "f28": {
+        "module": ""
+      },
+      "f29": {
+        "visible": false,
+        "module": ""
+      },
+      "f30": {
+        "visible": false,
+        "module": ""
+      },
+      "f31": {
+        "module": ""
+      },
+      "f32": {
+        "visible": false,
+        "module": ""
+      },
+      "f33": {
+        "module": ""
+      },
+      "f34": {
+        "visible": false,
+        "module": ""
+      },
+      "f35": {
+        "visible": false,
+        "module": ""
+      },
+      "f36": {
+        "visible": false,
+        "module": ""
+      },
+      "f37": {
+        "module": ""
+      },
+      "f38": {
+        "visible": false,
+        "module": ""
+      },
+      "f39": {
+        "visible": false,
+        "module": ""
+      },
+      "f40": {
+        "visible": false,
+        "module": ""
+      },
+      "f41": {
+        "visible": false,
+        "module": ""
+      },
+      "f42": {
+        "visible": false,
+        "module": ""
+      },
+      "f43": {
+        "visible": false,
+        "module": ""
+      },
+      "f44": {
+        "visible": false,
+        "module": ""
+      },
+      "f45": {
+        "module": ""
+      },
+      "f46": {
+        "module": ""
+      },
+      "f47": {
+        "module": ""
+      },
+      "f48": {
+        "visible": false,
+        "module": ""
+      },
+      "f49": {
+        "visible": false,
+        "module": ""
+      },
+      "f50": {
+        "module": ""
+      },
+      "f51": {
+        "module": ""
+      }
+    }
+  }
+]

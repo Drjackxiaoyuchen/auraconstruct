@@ -53,6 +53,7 @@ class Construct:
     source_name: str
     source_format: str
     warnings: list[str] = field(default_factory=list)
+    provenance: dict = field(default_factory=dict)
 
     @property
     def length(self):
