@@ -2,7 +2,7 @@
 
 **DNA sequence files to clear genetic construct illustrations and editable PowerPoint modules.**
 
-![Two-module example](examples/demo.svg)
+![Single-line Cas9 and gRNA construct](examples/pMYT095_Single_Line.svg)
 
 Import a GenBank, SnapGene, FASTA, EMBL, or plain DNA file. Review its annotations, choose SBOL Visual glyphs, and export a figure whose labels and glyph paths remain native PowerPoint objects. AuraConstruct is an illustration tool for presentations, teaching, and figure preparation.
 
@@ -23,7 +23,7 @@ Open [the local studio](http://127.0.0.1:8741). On macOS, `launch.command` start
 
 1. Drop one or more files, or select a public toolkit plasmid and choose **Load public example**.
 2. Review the feature table. Edit labels, roles, colors, module names, and visibility.
-3. Choose **Schematic** for a presentation or **Coordinates** to check positions. **Detailed** annotations show lengths, strands, source notes and short annotated sequences; **Overview** keeps compact modules.
+3. **Single line** keeps the entire construct on one continuous backbone, with labels above and a bp axis and module brackets below. Choose **Wrapped** for full annotation callouts across pages, or **Coordinates** for separate interval lanes.
 4. Export **PowerPoint**. Select a named feature group and ungroup it to edit individual glyph strokes or text. Copy groups into your own deck.
 5. **Save project** preserves all loaded constructs and illustration settings. **Open project** restores them. **Export all constructs** combines figures into one PPTX.
 
@@ -31,15 +31,15 @@ The studio includes real public **YTK pYTK001**, **MYT pMYT001/pMYT075/pMYT095**
 
 ## Complex construct demo
 
-![pYSD328 presentation map](examples/pYSD328_Overview.svg)
+![pYSD328 presentation map](examples/pYSD328_Single_Line.svg)
 
-**pYSD328: 8,197 bp, 70 source annotations**, including an assembled nanobody-display fusion, overlapping protein regions, tags, primers, yeast selection/maintenance and a reverse-strand bacterial cassette. These are 70 annotations, not 70 separate genes. Two presets offer a 16-part presentation selection and all 70 annotations. Use **Overview** for the whole selected construct or **Detailed** for positions, lengths and callouts.
+**pYSD328: 8,197 bp, 70 source annotations**, including an assembled nanobody-display fusion, overlapping protein regions, tags, primers, yeast selection/maintenance and a reverse-strand bacterial cassette. These are 70 annotations, not 70 separate genes. Two presets offer a 16-part presentation selection and all 70 annotations. Both remain on one backbone in the default **Single line** view.
 
-[Download the editable 10-slide complex demo](examples/AuraConstruct_Complex_YSD328.pptx): one selected overview plus nine full-detail slides. [Source and display decisions](docs/PUBLIC_DEMOS.md#complex-construct-demo).
+[Download the editable single-line demos](examples/AuraConstruct_Single_Line_Demos.pptx): Cas9/gRNA, selected YSD fusion and all 70 YSD annotations, each on one slide. The [wrapped detail deck](examples/AuraConstruct_Complex_YSD328.pptx) remains available for longer callouts. [Source and display decisions](docs/PUBLIC_DEMOS.md#complex-construct-demo).
 
-With the studio running, [open the selected overview](http://127.0.0.1:8741/?demo=ysd328&detail=overview) or [all 70 detailed annotations](http://127.0.0.1:8741/?demo=ysd328-all). These links load the bundled public example automatically.
+With the studio running, [open the single-line Cas9/gRNA demo](http://127.0.0.1:8741/?demo=myt095&layout=singleline), [selected YSD fusion](http://127.0.0.1:8741/?demo=ysd328&layout=singleline) or [all 70 annotations](http://127.0.0.1:8741/?demo=ysd328-all&layout=singleline). These links load the bundled public example automatically.
 
-## What works in v0.4
+## What works in v0.5
 
 | Area | Support |
 | --- | --- |
@@ -67,12 +67,14 @@ For unannotated DNA, use **Match reference parts** with a trusted local part lib
 
 ## Detailed annotation
 
-The teaching view adds source coordinates, length, strand, homology-arm/barcode/primer context, source notes and editable callouts alongside SBOL glyphs. New public MYT examples show an Int.1 donor and a Cas9/gRNA-processing vector. [Detailed annotation behavior and coordinate limits](docs/DETAILED_ANNOTATIONS.md).
+Single-line maps use compact labels and retain complete callouts in the review table, project and speaker notes. Choose **Wrapped → Detailed** to place source coordinates, length, strand, homology-arm/barcode/primer context, source notes and editable callouts alongside each SBOL glyph. [Detailed annotation behavior and coordinate limits](docs/DETAILED_ANNOTATIONS.md).
 
 ## Command line
 
 ```bash
-auraconstruct export plasmid.gb -o figure.pptx --detail detailed
+auraconstruct export plasmid.gb -o figure.pptx
+auraconstruct export plasmid.gb -o one-line.pptx --layout singleline
+auraconstruct export plasmid.gb -o full-callouts.pptx --layout schematic --detail detailed
 auraconstruct export vector.dna -o figure.svg --palette colorblind
 auraconstruct export construct.fa -o figure.pptx --reference trusted-parts.gb --topology circular
 auraconstruct export construct.fa -o figure.pptx --annotate plannotate --topology linear
@@ -80,7 +82,7 @@ auraconstruct export *.gb -o all-constructs.pptx --coordinates
 auraconstruct export annotated.gb -o coordinates.pptx --layout proportional
 ```
 
-For multiple SVG pages, the CLI writes numbered SVG files. The browser app downloads a ZIP. Proportional mode places exact colored interval tracks on a shared bp axis; glyph widths have readability limits. In schematic mode, part order follows sequence coordinates and lengths are not to scale. Lanes in coordinate mode separate overlapping features on the same DNA molecule.
+For multiple SVG pages, the CLI writes numbered SVG files. The browser app downloads a ZIP. **Single line** is the CLI, API and studio default: its backbone and CDS spans follow sequence coordinates, small symbols have minimum readable sizes, labels occupy tiers above the line, and explicit module spans appear below it. Its axis uses sequence-boundary positions from 0 to sequence length. Feature intervals in notes/table remain 1-based inclusive. **Wrapped** schematic order follows sequence coordinates with lengths not to scale. Coordinate mode puts exact colored interval tracks on a shared bp axis, using lanes to separate overlapping features on the same DNA molecule.
 
 [Editable detailed MYT examples](examples/AuraConstruct_Detailed_MYT_Annotations.pptx) show donor arms, barcodes, primer sites and Cas9/gRNA annotations. [Editable public demo examples](examples/AuraConstruct_Aureka_Public_Demos.pptx) combine the YTK, MYT and YSD 2.0 figures.
 
@@ -98,7 +100,8 @@ The useful gap is the editable PPTX workflow. The projects reviewed document str
 - No gene function, regulatory interaction, promoter strength, expression level or biological performance is inferred from drawing order.
 - Circular DNA is displayed as a linearized construct. Joined locations retain their ordered segments. The schematic sorts by the smallest segment coordinate, so origin-crossing features need coordinate-view review.
 - Fuzzy coordinates use integer bounds for drawing. The project retains a fuzzy flag and the imported location string; GenBank export writes those integer locations with the original string in a qualifier.
-- Overview maps paginate at 16 features per schematic slide or three coordinate lanes per slide. Detailed maps use eight features per slide or two coordinate lanes. Very long display labels may shorten; full labels remain in the project, GenBank and speaker notes.
+- Single-line maps never wrap or split a construct across slides. Dense labels use tiers above the same backbone. Parent outlines preserve overlapping regions; one group can contain multiple joined segments. If labels or module brackets exceed readable space, the app asks you to shorten labels or hide secondary features instead of wrapping the backbone. Full labels and callouts remain in project/GenBank/speaker notes.
+- Wrapped overview maps paginate at 16 features per slide; wrapped detailed maps use eight. Coordinate mode uses three or two lanes per slide respectively.
 - Input limit: 20 MB after decompression. This tool targets constructs and plasmids, rather than whole-genome annotation or assembly analysis.
 - SnapGene sequence and features are imported through Biopython. Proprietary history, enzyme catalogs and cloning operations are outside this version.
 - pLannotate integration requires its own installed tools and databases. The adapter is tested with a controlled executable result; a live pLannotate database run was not performed in the development environment.

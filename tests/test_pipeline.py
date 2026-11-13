@@ -240,7 +240,7 @@ def test_dense_public_construct_keeps_overlaps_and_every_source_feature():
     assert next(f for f in full.features if f.id=='f14').segments==[[961,1333]]
     assert next(f for f in full.features if f.id=='f58').role_source=='demo-curated'
     for detail,expected in [('overview',5),('detailed',9)]:
-        pages=build_pages(full,detail=detail,coordinates=True)
+        pages=build_pages(full,layout='schematic',detail=detail,coordinates=True)
         assert len(pages)==expected
         groups=[{s.group for s in p.items if s.group} for p in pages]
         assert set.union(*groups)=={f.id for f in full.features}
@@ -252,12 +252,56 @@ def test_dense_public_construct_keeps_overlaps_and_every_source_feature():
     assert {s.group for p in pages for s in p.items if s.group}=={f.id for f in full.features}
 
 
+@pytest.mark.parametrize('demo_id',['myt095','ysd328','ysd328-all'])
+def test_single_line_never_wraps_and_keeps_native_feature_groups(demo_id):
+    from auraconstruct.demos import load_demo
+    from auraconstruct.singleline import _labels
+    c=load_demo(demo_id)
+    features=[f for f in c.features if f.visible]
+    pages=build_pages(c)  # Single line is the library/API default too.
+    assert len(pages)==1
+    p=pages[0]
+    backbones=[s for s in p.items if s.name=='Continuous DNA backbone']
+    assert len(backbones)==1
+    y=backbones[0].y
+    cds=[s for s in p.items if s.name=='Coding sequence' and s.kind=='path']
+    assert all(abs(s.y+s.h/2-y)<.001 for s in cds)
+    assert {s.group for s in p.items if s.group}=={f.id for f in features}
+    assert all(s.x>=0 and s.y>=0 and s.x+s.w<=W+1 and s.y+s.h<=H+1 for s in p.items)
+    labels,_,_= _labels(features,1276/c.length,82,1358)
+    for i,a in enumerate(labels):
+        for b in labels[i+1:]:
+            if a['row']==b['row']:
+                assert a['x']+a['width']+11<=b['x'] or b['x']+b['width']+11<=a['x']
+    if demo_id=='myt095':
+        cas9=next(s for s in cds if s.group=='f3')
+        assert abs(cas9.w-(4733-632)*1276/c.length)<.001
+    with ZipFile(io.BytesIO(to_pptx(pages))) as z:
+        root=ET.fromstring(z.read('ppt/slides/slide1.xml'))
+        assert len(root.findall(f'.//{{{P}}}grpSp'))==len(features)
+        assert len([e for e in root.findall(f'.//{{{P}}}cNvPr') if e.get('name')=='Continuous DNA backbone'])==1
+        notes=z.read('ppt/notesSlides/notesSlide1.xml').decode()
+        assert c.provenance['doi'] in notes
+        assert all(f'{f.id}:' in notes for f in features)
+
+
+def test_single_line_keeps_origin_crossings_and_mixed_strand_joins_on_one_backbone():
+    c=Construct('join','join','ACGT'*500,'circular',[
+        Feature('join','Joined part','CDS','cds',[[1900,2000],[0,50]],-1,segment_strands=[-1,-1]),
+        Feature('mixed','Mixed join','CDS','cds',[[100,150],[700,800]],0,segment_strands=[1,-1])
+    ],'joined.gb','genbank')
+    p=build_pages(c)[0]
+    assert len([s for s in p.items if s.name=='Continuous DNA backbone'])==1
+    assert len([s for s in p.items if s.name=='Coding sequence'])==4
+    assert '1..50' in p.notes and '1,901..2,000' in p.notes
+
+
 def test_detailed_mode_has_coordinates_notes_and_native_objects():
     from auraconstruct.demos import load_demo
     c=load_demo('myt075')
     c.features[0].caption='Reviewed homology arm caption'
     c.features[0].caption_source='user-caption'
-    pages=build_pages(c,detail='detailed')
+    pages=build_pages(c,layout='schematic',detail='detailed')
     assert len(pages)==3
     svg=to_svg(pages[0])
     assert '519 bp' in svg and 'Homology arm' in svg and 'Reviewed homology arm caption' in svg

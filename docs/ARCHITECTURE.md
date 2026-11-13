@@ -26,6 +26,7 @@ GenBank / SnapGene / FASTA / EMBL / raw DNA
 - `demos.py`: checked public examples and display presets.
 - `details.py`: annotation categories, source summaries and short stored feature sequences.
 - `scene.py`: shared primitives, glyphs, layout, pagination and SVG.
+- `singleline.py`: one sequence-scaled backbone, collision-free label tiers and explicit module brackets; no construct wrapping or pagination.
 - `pptx.py`: native paths, text boxes, named feature groups, notes and PowerPoint package relationships.
 - `server.py`: loopback-only Flask interface; uploaded files are not persisted.
 - `web/`: browser UI without a JavaScript build step or external CDN.
@@ -50,6 +51,6 @@ Run `auraconstruct serve --no-browser`. Bind address is always `127.0.0.1`. POST
 | POST `/api/export/gb` | Same | Annotated GenBank including DNA |
 | POST `/api/project` | Project JSON | Validated records and options |
 
-Options: `layout` (`schematic` or `proportional`), `palette` (`aureka`, `paper`, `colorblind`, `mono`), `coordinates` (boolean), `detail` (`overview` or `detailed`), and optional `title`.
+Options: `layout` (`singleline`, `schematic` or `proportional`; default `singleline`), `palette` (`aureka`, `paper`, `colorblind`, `mono`), `coordinates` (boolean), `detail` (`overview` or `detailed`), and optional `title`. Single-line maps keep compact labels; `detail` and `coordinates` apply to wrapped/coordinate views. Full callouts remain in the single-line PowerPoint notes and project data.
 
 Project JSON stores `schema_version: 1`, `records`, and `options`. Each construct stores sequence, topology, source name/format, warnings and features. Features store ordered segments, strand and optional per-segment strands, qualifiers, annotation source, role-source, display color, visibility, module and fuzzy-boundary flag. Sequence data is not reconstructed from the drawing.

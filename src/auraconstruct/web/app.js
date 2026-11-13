@@ -1,6 +1,6 @@
 /* No external scripts, analytics, sequence storage, or remote annotation calls. */
 const $=id=>document.getElementById(id);
-const state={records:[],index:0,pages:[],page:0,options:{layout:'schematic',palette:'aureka',coordinates:false,detail:'detailed'}};
+const state={records:[],index:0,pages:[],page:0,options:{layout:'singleline',palette:'aureka',coordinates:false,detail:'detailed'}};
 const roles={promoter:'Promoter',rbs:'Ribosome entry site',cds:'Coding sequence',terminator:'Terminator',origin:'Replication origin',operator:'Operator',primer:'Primer binding site',scar:'Assembly scar',ncrna:'Non-coding RNA',recombination:'Recombination site',polya:'PolyA site',generic:'Unspecified'};
 Object.assign(roles,{region:'Unspecified region',engineered_region:'Engineered region',spacer:'Inert DNA spacer',nuclease_site:'Nuclease cleavage site'});
 let palettes={aureka:['#4200AC','#F9AC2F','#6500FF','#FF6D8E','#6FC0A9','#8882BE','#555656']};
@@ -47,8 +47,13 @@ function showPage(){
   $('canvas').innerHTML=state.pages[state.page]||'';
   $('pageInfo').textContent=`${state.page+1} / ${state.pages.length||1}`;
   $('prevPage').disabled=state.page<=0;$('nextPage').disabled=state.page>=state.pages.length-1;
-  $('viewLabel').textContent=state.options.layout==='schematic'?'Schematic view':'Sequence coordinates';
-  $('figureCaption').textContent=state.options.layout==='schematic'?(state.options.detail==='detailed'?'Not to scale. Imported positions, lengths, notes and short sequences accompany editable SBOL glyphs.':'Not to scale. Every glyph and label remains editable in PowerPoint.'):'Colored interval tracks show exact spans. Glyph widths adjust for readability.';
+  $('viewLabel').textContent=state.options.layout==='singleline'?'Single line':state.options.layout==='schematic'?'Wrapped schematic':'Sequence coordinates';
+  $('figureCaption').textContent=state.options.layout==='singleline'?'One continuous DNA backbone. Labels above, source bp axis and module brackets below. Full callouts remain in the table and PowerPoint notes.':state.options.layout==='schematic'?(state.options.detail==='detailed'?'Not to scale. Imported positions, lengths, notes and short sequences accompany editable SBOL glyphs.':'Not to scale. Every glyph and label remains editable in PowerPoint.'):'Colored interval tracks show exact spans. Glyph widths adjust for readability.';
+}
+function syncLayoutControls(){
+  for(const b of document.querySelectorAll('[data-layout]'))b.classList.toggle('active',b.dataset.layout===state.options.layout);
+  const single=state.options.layout==='singleline';$('detail').disabled=single;$('coordinates').disabled=single;
+  $('singleLineNote').hidden=!single;
 }
 function td(child){const el=document.createElement('td');el.append(child);return el;}
 function input(value,change,placeholder=''){
@@ -107,7 +112,7 @@ for(const name of ['dragleave','drop'])drop.addEventListener(name,e=>{e.preventD
 drop.addEventListener('drop',guarded(e=>importFiles([...e.dataTransfer.files])));
 $('recordSelect').addEventListener('change',e=>selectRecord(Number(e.target.value)));
 $('topology').addEventListener('change',()=>{if(current()){current().topology=$('topology').value;selectRecord(state.index);}});
-for(const button of document.querySelectorAll('[data-layout]'))button.addEventListener('click',()=>{state.options.layout=button.dataset.layout;for(const b of document.querySelectorAll('[data-layout]'))b.classList.toggle('active',b===button);scheduleRender();});
+for(const button of document.querySelectorAll('[data-layout]'))button.addEventListener('click',()=>{state.options.layout=button.dataset.layout;state.page=0;syncLayoutControls();scheduleRender();});
 $('palette').addEventListener('change',()=>{state.options.palette=$('palette').value;updateTable();scheduleRender();});
 $('coordinates').addEventListener('change',()=>{state.options.coordinates=$('coordinates').checked;scheduleRender();});
 $('detail').addEventListener('change',()=>{state.options.detail=$('detail').value;state.page=0;scheduleRender();});
@@ -132,7 +137,7 @@ $('projectInput').addEventListener('change',guarded(async e=>{
   const file=e.target.files[0];if(!file)return;
   const raw=JSON.parse(await file.text());const res=await api('/api/project',raw);const data=await res.json();
   state.options={...state.options,...data.options};$('palette').value=state.options.palette;$('coordinates').checked=state.options.coordinates;$('detail').value=state.options.detail;
-  for(const b of document.querySelectorAll('[data-layout]'))b.classList.toggle('active',b.dataset.layout===state.options.layout);
+  syncLayoutControls();
   setRecords(data.records);notice('Project restored.');e.target.value='';
 }));
 for(const [role,name] of Object.entries(roles))$('newRole').add(new Option(name,role));
@@ -148,6 +153,8 @@ guarded(async()=>{
   const res=await fetch('/api/status');const s=await res.json();palettes=s.palettes||palettes;roleColorIndices=s.role_color_indices||roleColorIndices;
   $('version').textContent=`v${s.version}`;$('plannotate').disabled=!s.plannotate;$('annotationStatus').textContent=s.plannotate?'pLannotate found locally. Database readiness is checked when run.':'pLannotate is optional and not installed. Exact reference matching is ready.';
   const params=new URLSearchParams(location.search),demo=params.get('demo');
+  if(['singleline','schematic','proportional'].includes(params.get('layout')))state.options.layout=params.get('layout');
+  syncLayoutControls();
   if(demo&&[...$('demoSelect').options].some(o=>o.value===demo)){
     $('demoSelect').value=demo;
     if(['overview','detailed'].includes(params.get('detail'))){state.options.detail=params.get('detail');$('detail').value=state.options.detail;}

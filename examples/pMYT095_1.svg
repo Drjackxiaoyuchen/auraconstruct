@@ -15,7 +15,7 @@
 <path d="M 1345 293 L 1352 307" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 1352 293 L 1359 307" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 167.25 300 L 167.25 258 L 210.25 258 M 196.25 246 L 210.25 258 L 196.25 270" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="186.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">ScMYO4 Promoter</text>
+<text x="186.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">pScMYO4</text>
 <path d="M 303.75 281 L 391.75 281 L 391.75 319 L 303.75 319 C 277.75 319 277.75 281 303.75 281 Z " fill="#FFFFFF" stroke="#555656" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="338.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">NLS</text>
 <path d="M 438.25 281 L 522.25 281 L 544.25 300 L 522.25 319 L 438.25 319 Z " fill="#6500FF" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
@@ -23,15 +23,13 @@
 <path d="M 608.75 281 L 696.75 281 L 696.75 319 L 608.75 319 C 582.75 319 582.75 281 608.75 281 Z " fill="#FFFFFF" stroke="#555656" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="643.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">NLS</text>
 <path d="M 796.25 300 L 796.25 256 M 774.25 256 L 818.25 256" fill="none" stroke="#FF6D8E" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="796.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">ScEFM1</text>
-<text x="796.25" y="402" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">Terminator</text>
+<text x="796.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">tScEFM1</text>
 <path d="M 929.75 300 L 929.75 258 L 972.75 258 M 958.75 246 L 972.75 258 L 958.75 270" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="948.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">ScPFY1 Promoter</text>
+<text x="948.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">pScPFY1</text>
 <path d="M 1063.25 300 L 1063.25 285 C 1069.25 265 1075.25 295 1082.25 279 C 1089.25 262 1094.25 295 1101.25 279 C 1108.25 262 1113.25 295 1120.25 279 C 1127.25 262 1133.25 295 1139.25 285 L 1139.25 300 Z " fill="#FFFFFF" stroke="#555656" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="1101.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">tGCC</text>
+<text x="1101.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">tRNA (tGCC)</text>
 <path d="M 1234.75 300 L 1234.75 258 L 1277.75 258 M 1263.75 246 L 1277.75 258 L 1263.75 270" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="1253.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">BBa_J72163 GlpT</text>
-<text x="1253.75" y="402" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">Promoter</text>
+<text x="1253.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">pGlpT</text>
 <path d="M 118 214 L 118 208" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 118 208 L 864.5 208" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 864.5 208 L 864.5 214" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
@@ -47,23 +45,20 @@
 <path d="M 1352 538 L 1359 552" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 164.25 545 L 164.25 538 C 164.25 509 208.25 509 208.25 538 L 208.25 545 Z " fill="#FFFFFF" stroke="#F9AC2F" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="186.25" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">RBS</text>
-<path d="M 285.75 526 L 369.75 526 L 391.75 545 L 369.75 564 L 285.75 564 Z " fill="#6500FF" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 285.75 526 L 369.75 526 L 391.75 545 L 369.75 564 L 285.75 564 Z " fill="#6FC0A9" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="338.75" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="middle">sfGFP</text>
 <path d="M 491.25 545 L 491.25 501 M 469.25 501 L 513.25 501" fill="none" stroke="#FF6D8E" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="491.25" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">BBa_B0015</text>
-<text x="491.25" y="647" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">Terminator</text>
+<text x="491.25" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">B0015</text>
 <path d="M 605.75 545 L 605.75 530 C 611.75 510 617.75 540 624.75 524 C 631.75 507 636.75 540 643.75 524 C 650.75 507 655.75 540 662.75 524 C 669.75 507 675.75 540 681.75 530 L 681.75 545 Z " fill="#FFFFFF" stroke="#555656" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="643.75" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">Cas9 gRNA</text>
-<text x="643.75" y="647" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">scaffold</text>
+<text x="643.75" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">gRNA scaffold</text>
 <path d="M 758.25 545 L 758.25 530 C 764.25 510 770.25 540 777.25 524 C 784.25 507 789.25 540 796.25 524 C 803.25 507 808.25 540 815.25 524 C 822.25 507 828.25 540 834.25 530 L 834.25 545 Z " fill="#FFFFFF" stroke="#555656" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="796.25" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">tCCC</text>
+<text x="796.25" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">tRNA (tCCC)</text>
 <path d="M 929.75 545 L 929.75 503 L 972.75 503 M 958.75 491 L 972.75 503 L 958.75 515" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="948.75" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">SbTDH3 Promoter</text>
-<path d="M 1048.25 526 L 1132.25 526 L 1154.25 545 L 1132.25 564 L 1048.25 564 Z " fill="#6500FF" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="948.75" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">pSbTDH3</text>
+<path d="M 1048.25 526 L 1132.25 526 L 1154.25 545 L 1132.25 564 L 1048.25 564 Z " fill="#FF6D8E" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="1101.25" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="middle">mScarlet</text>
 <path d="M 1253.75 545 L 1253.75 501 M 1231.75 501 L 1275.75 501" fill="none" stroke="#FF6D8E" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="1253.75" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">ScRPL15A</text>
-<text x="1253.75" y="647" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">Terminator</text>
+<text x="1253.75" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">tScRPL15A</text>
 <path d="M 118 459 L 118 453" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 118 453 L 1322 453" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 1322 453 L 1322 459" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>

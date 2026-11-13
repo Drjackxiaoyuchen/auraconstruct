@@ -18,16 +18,16 @@
 <text x="262.5" y="429" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">FRT site</text>
 <text x="262.5" y="475" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">10,158..10,195 / 38 bp / strand +</text>
 <text x="262.5" y="493" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Recombination site / Yeast maintenance /…</text>
-<path d="M 623.5 369 L 533.5 369 L 511.5 350 L 533.5 331 L 623.5 331 Z " fill="#6500FF" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 623.5 369 L 533.5 369 L 511.5 350 L 533.5 331 L 623.5 331 Z " fill="#8882BE" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="567.5" y="429" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="middle">SpecR</text>
 <text x="567.5" y="475" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">10,200..11,210 / 1,011 bp / strand −</text>
 <text x="567.5" y="493" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Coding sequence / Bacterial backbone</text>
 <path d="M 891.5 350 L 891.5 392 L 848.5 392 M 862.5 404 L 848.5 392 L 862.5 380" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="872.5" y="429" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">SpecR Promoter</text>
+<text x="872.5" y="429" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">pSpecR</text>
 <text x="872.5" y="475" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">11,211..11,344 / 134 bp / strand −</text>
 <text x="872.5" y="493" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Promoter / Bacterial backbone</text>
 <path d="M 1201.5 350 C 1201.5 363.255 1190.75 374 1177.5 374 C 1164.25 374 1153.5 363.255 1153.5 350 C 1153.5 336.745 1164.25 326 1177.5 326 C 1190.75 326 1201.5 336.745 1201.5 350 Z " fill="#FFFFFF" stroke="#6FC0A9" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="1177.5" y="429" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">pBBR1</text>
+<text x="1177.5" y="429" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">pBBR1 origin</text>
 <text x="1177.5" y="475" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">11,345..12,866 / 1,522 bp / strand −</text>
 <text x="1177.5" y="493" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Replication origin / Bacterial backbone</text>
 </svg>

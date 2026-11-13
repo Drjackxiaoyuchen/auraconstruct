@@ -1,6 +1,6 @@
 # Detailed schematics
 
-Choose **Annotation detail → Detailed** to add sequence-grounded annotation to each SBOL feature group. This is the default in new studio sessions and CLI exports. **Overview** keeps the compact module view.
+Choose **Wrapped → Annotation detail → Detailed** to add sequence-grounded annotation to each SBOL feature group. New sessions and CLI exports default to **Single line**, which keeps one continuous backbone with compact labels and retains complete callouts in the table and PowerPoint notes. **Wrapped → Overview** keeps compact modules across rows.
 
 The detailed view includes:
 

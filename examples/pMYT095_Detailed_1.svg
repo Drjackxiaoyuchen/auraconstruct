@@ -15,7 +15,7 @@
 <path d="M 1345 243 L 1352 257" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 1352 243 L 1359 257" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 243.5 250 L 243.5 208 L 286.5 208 M 272.5 196 L 286.5 208 L 272.5 220" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="262.5" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">ScMYO4 Promoter</text>
+<text x="262.5" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">pScMYO4</text>
 <text x="262.5" y="375" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">33..584 / 552 bp / strand +</text>
 <text x="262.5" y="393" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Promoter / Cas9 expression</text>
 <path d="M 529.5 231 L 623.5 231 L 623.5 269 L 529.5 269 C 503.5 269 503.5 231 529.5 231 Z " fill="#FFFFFF" stroke="#555656" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
@@ -40,21 +40,21 @@
 <path d="M 1345 518 L 1352 532" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 1352 518 L 1359 532" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 262.5 525 L 262.5 481 M 240.5 481 L 284.5 481" fill="none" stroke="#FF6D8E" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="262.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">ScEFM1 Terminator</text>
+<text x="262.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">tScEFM1</text>
 <text x="262.5" y="650" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">4,786..4,860 / 75 bp / strand +</text>
 <text x="262.5" y="668" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Terminator / Cas9 expression</text>
 <path d="M 548.5 525 L 548.5 483 L 591.5 483 M 577.5 471 L 591.5 483 L 577.5 495" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="567.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">ScPFY1 Promoter</text>
+<text x="567.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">pScPFY1</text>
 <text x="567.5" y="650" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">4,921..5,207 / 287 bp / strand +</text>
 <text x="567.5" y="668" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Promoter / gRNA processing / dropout</text>
 <path d="M 834.5 525 L 834.5 510 C 840.5 490 846.5 520 853.5 504 C 860.5 487 865.5 520 872.5 504 C 879.5 487 884.5 520 891.5 504 C 898.5 487 904.5 520 910.5 510 L 910.5 525 Z " fill="#FFFFFF" stroke="#555656" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="872.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">tGCC</text>
+<text x="872.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">tRNA (tGCC)</text>
 <text x="872.5" y="650" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">5,224..5,300 / 77 bp / strand +</text>
 <text x="872.5" y="668" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">tRNA annotation / gRNA processing / dropout</text>
 <text x="872.5" y="689" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">tRNA region of the gRNA processing</text>
 <text x="872.5" y="705" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">cassette.</text>
 <path d="M 1158.5 525 L 1158.5 483 L 1201.5 483 M 1187.5 471 L 1201.5 483 L 1187.5 495" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="1177.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">BBa_J72163 GlpT Promoter</text>
+<text x="1177.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">pGlpT</text>
 <text x="1177.5" y="650" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">5,312..5,441 / 130 bp / strand +</text>
 <text x="1177.5" y="668" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Promoter / gRNA processing / dropout</text>
 </svg>

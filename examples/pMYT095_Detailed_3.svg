@@ -17,14 +17,14 @@
 <path d="M 1200 243 L 1207 257" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 1207 243 L 1214 257" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 410 250 L 410 206 M 388 206 L 432 206" fill="none" stroke="#FF6D8E" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="410" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">ScVMA16 terminator</text>
+<text x="410" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">tScVMA16</text>
 <text x="410" y="375" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">7,830..8,079 / 250 bp / strand +</text>
 <text x="410" y="393" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Terminator / gRNA processing / dropout</text>
 <path d="M 701 250 L 701 208 L 744 208 M 730 196 L 744 208 L 730 220" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="720" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">ScURA3 Promoter</text>
+<text x="720" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">pScURA3</text>
 <text x="720" y="375" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">8,124..8,300 / 177 bp / strand +</text>
 <text x="720" y="393" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Promoter / Yeast maintenance / selection</text>
-<path d="M 974 231 L 1064 231 L 1086 250 L 1064 269 L 974 269 Z " fill="#6500FF" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 974 231 L 1064 231 L 1086 250 L 1064 269 L 974 269 Z " fill="#F9AC2F" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="1030" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="middle">URA3</text>
 <text x="1030" y="375" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">8,301..9,104 / 804 bp / strand +</text>
 <text x="1030" y="393" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Coding sequence / Yeast maintenance /…</text>
@@ -34,11 +34,11 @@
 <path d="M 1045 518 L 1052 532" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 1052 518 L 1059 532" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 565 525 L 565 481 M 543 481 L 587 481" fill="none" stroke="#FF6D8E" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="565" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">ScURA3 Terminator</text>
+<text x="565" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">tScURA3</text>
 <text x="565" y="650" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">9,105..9,182 / 78 bp / strand +</text>
 <text x="565" y="668" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Terminator / Yeast maintenance / selection</text>
 <path d="M 851 525 C 851 511.745 861.745 501 875 501 C 888.255 501 899 511.745 899 525 C 899 538.255 888.255 549 875 549 C 861.745 549 851 538.255 851 525 Z " fill="#FFFFFF" stroke="#6FC0A9" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="875" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">2micron</text>
+<text x="875" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">2μ origin</text>
 <text x="875" y="650" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">9,195..10,157 / 963 bp / strand +</text>
 <text x="875" y="668" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Replication origin / Yeast maintenance /…</text>
 </svg>

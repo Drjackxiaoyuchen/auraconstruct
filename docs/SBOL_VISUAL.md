@@ -23,10 +23,10 @@ This release independently implements a subset of sequence-feature glyphs as nat
 | spacer | Circle with X | Explicit inert DNA spacer, SO:0002223 |
 | nuclease_site | X atop a DNA stem | Explicit nuclease site annotation |
 
-Reverse-strand directional glyphs rotate 180 degrees about the DNA backbone. Labels remain upright. Strand-unknown directional features carry a small question mark. Joined features appear once in the schematic and as separate interval segments in coordinate mode. Per-segment strands remain in project JSON and GenBank output.
+Reverse-strand directional glyphs rotate 180 degrees about the DNA backbone. Labels remain upright. Strand-unknown directional features carry a small question mark. Joined features appear once in the wrapped schematic; single-line and coordinate maps draw their separate interval segments in one named feature group. Per-segment strands remain in project JSON and GenBank output.
 
 Module brackets encode only user-supplied module names. They are a presentation annotation. They do not assert transcriptional units, functional insulation or regulatory interaction. Likewise, role colors are a styling choice rather than an SBOL semantic requirement.
 
-Internal coordinates use 0-based half-open intervals. Displayed coordinates are 1-based inclusive. Coordinate-view tracks encode exact intervals, while glyphs have minimum/maximum display widths. The schematic is explicitly labeled not to scale.
+Internal coordinates use 0-based half-open intervals. Feature intervals in the table and notes are 1-based inclusive. Single-line maps use a boundary-coordinate axis from 0 to sequence length; their CDS spans use sequence coordinates, with minimum sizes for short glyphs. Parent outlines and child features can overlap on the same backbone. Coordinate-view tracks encode exact intervals, while glyphs have minimum/maximum display widths. Wrapped schematics are explicitly labeled not to scale.
 
 SBOL Visual graphics and SBOL data exchange are separate concerns. The exported project JSON is an AuraConstruct schema and is not SBOL RDF or JSON-LD.

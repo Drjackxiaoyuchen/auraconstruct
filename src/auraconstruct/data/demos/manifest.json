@@ -430,84 +430,105 @@
     "length": 12866,
     "display_overrides": {
       "f1": {
-        "module": "Cas9 expression"
+        "module": "Cas9 expression",
+        "label": "pScMYO4"
       },
       "f2": {
         "caption": "Nuclear localization sequence in the Cas9 expression cassette.",
         "module": "Cas9 expression"
       },
       "f3": {
-        "module": "Cas9 expression"
+        "module": "Cas9 expression",
+        "color": "#6500FF"
       },
       "f4": {
         "caption": "Nuclear localization sequence in the Cas9 expression cassette.",
         "module": "Cas9 expression"
       },
       "f5": {
-        "module": "Cas9 expression"
+        "module": "Cas9 expression",
+        "label": "tScEFM1"
       },
       "f6": {
-        "module": "gRNA processing / dropout"
+        "module": "gRNA processing / dropout",
+        "label": "pScPFY1"
       },
       "f7": {
         "caption": "tRNA region of the gRNA processing cassette.",
-        "module": "gRNA processing / dropout"
+        "module": "gRNA processing / dropout",
+        "label": "tRNA (tGCC)"
       },
       "f8": {
-        "module": "gRNA processing / dropout"
+        "module": "gRNA processing / dropout",
+        "label": "pGlpT"
       },
       "f9": {
         "module": "gRNA processing / dropout"
       },
       "f10": {
-        "module": "gRNA processing / dropout"
+        "module": "gRNA processing / dropout",
+        "color": "#6FC0A9"
       },
       "f11": {
-        "module": "gRNA processing / dropout"
+        "module": "gRNA processing / dropout",
+        "label": "B0015"
       },
       "f12": {
         "caption": "Cas9 guide RNA scaffold.",
-        "module": "gRNA processing / dropout"
+        "module": "gRNA processing / dropout",
+        "label": "gRNA scaffold"
       },
       "f13": {
         "caption": "tRNA region of the gRNA processing cassette.",
-        "module": "gRNA processing / dropout"
+        "module": "gRNA processing / dropout",
+        "label": "tRNA (tCCC)"
       },
       "f14": {
-        "module": "gRNA processing / dropout"
+        "module": "gRNA processing / dropout",
+        "label": "pSbTDH3"
       },
       "f15": {
-        "module": "gRNA processing / dropout"
+        "module": "gRNA processing / dropout",
+        "color": "#FF6D8E"
       },
       "f16": {
-        "module": "gRNA processing / dropout"
+        "module": "gRNA processing / dropout",
+        "label": "tScRPL15A"
       },
       "f17": {
-        "module": "gRNA processing / dropout"
+        "module": "gRNA processing / dropout",
+        "label": "tScVMA16"
       },
       "f18": {
-        "module": "Yeast maintenance / selection"
+        "module": "Yeast maintenance / selection",
+        "label": "pScURA3"
       },
       "f19": {
-        "module": "Yeast maintenance / selection"
+        "module": "Yeast maintenance / selection",
+        "color": "#F9AC2F"
       },
       "f20": {
-        "module": "Yeast maintenance / selection"
+        "module": "Yeast maintenance / selection",
+        "label": "tScURA3"
       },
       "f21": {
-        "module": "Yeast maintenance / selection"
+        "module": "Yeast maintenance / selection",
+        "label": "2μ origin"
       },
       "f22": {
         "module": "Yeast maintenance / selection"
       },
       "f23": {
-        "module": "Bacterial backbone"
+        "module": "Bacterial backbone",
+        "color": "#8882BE"
       },
       "f24": {
-        "module": "Bacterial backbone"
+        "module": "Bacterial backbone",
+        "label": "pSpecR"
       },
       "f25": {
-        "module": "Bacterial backbone"
+        "module": "Bacterial backbone",
+        "label": "pBBR1 origin"
       }
     }
   },

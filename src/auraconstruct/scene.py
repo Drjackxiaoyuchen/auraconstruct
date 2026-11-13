@@ -183,7 +183,7 @@ def _coordinate(f):
 
 def _feature_notes(p, features):
     for f in features:
-        p.notes += f"\n{f.id}: {f.label}; {_coordinate(f)}; role={f.role}; role source={f.role_source}; annotation source={f.source}"
+        p.notes += f"\n{f.id}: {f.label}; {_coordinate(f)}; role={f.role}; role source={f.role_source}; annotation source={f.source}; module={f.module}"
         original=f.qualifiers.get("label",[])
         if isinstance(original,str):original=[original]
         if original and " / ".join(original)!=f.label:
@@ -192,13 +192,16 @@ def _feature_notes(p, features):
         if caption:p.notes += f"; caption ({caption_source}): {caption}"
 
 
-def build_pages(c, layout="schematic", palette="aureka", coordinates=False, title=None, detail="overview"):
+def build_pages(c, layout="singleline", palette="aureka", coordinates=False, title=None, detail="overview"):
     validate(c)
-    if layout not in ("schematic", "proportional") or palette not in PALETTES or detail not in ("overview","detailed"):
+    if layout not in ("singleline", "schematic", "proportional") or palette not in PALETTES or detail not in ("overview","detailed"):
         raise ValueError("Unknown layout or palette.")
     features = sorted([f for f in c.features if f.visible], key=lambda f: (f.start, f.end, f.id))
     if len(features) > 5000:
         raise ValueError("Choose at most 5,000 illustrated features.")
+    if layout == "singleline":
+        from .singleline import single_line_pages
+        return single_line_pages(c,features,palette,title)
     if layout == "proportional":
         return proportional_pages(c, features, palette, title, detail)
     if detail == "detailed":

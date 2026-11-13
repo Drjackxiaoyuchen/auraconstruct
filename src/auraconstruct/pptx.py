@@ -82,7 +82,7 @@ def sp_tree(items):
             continue
         x, y = min(i.x for i in group_items), min(i.y for i in group_items)
         w, h = max(i.x+i.w for i in group_items)-x, max(i.y+i.h for i in group_items)-y
-        label = next((i.text for i in group_items if i.kind=="text" and i.size>=14), group)
+        label = next((i.text for i in group_items if i.kind=="text" and i.size>=12), group)
         name = escape(f"{group} / {label}",quote=True)
         parts.append(f'<p:grpSp><p:nvGrpSpPr><p:cNvPr id="{next(ids)}" name="{name}"/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr>{xfrm(x,y,w,h,True)}</p:grpSpPr>')
         parts.extend(shape(i,next(ids)) for i in group_items)

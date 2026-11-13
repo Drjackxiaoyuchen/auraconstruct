@@ -17,23 +17,21 @@
 <path d="M 1345 293 L 1352 307" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 1352 293 L 1359 307" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 186.25 300 L 186.25 256 M 164.25 256 L 208.25 256" fill="none" stroke="#FF6D8E" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="186.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">ScVMA16</text>
-<text x="186.25" y="402" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">terminator</text>
+<text x="186.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">tScVMA16</text>
 <path d="M 319.75 300 L 319.75 258 L 362.75 258 M 348.75 246 L 362.75 258 L 348.75 270" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="338.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">ScURA3 Promoter</text>
-<path d="M 438.25 281 L 522.25 281 L 544.25 300 L 522.25 319 L 438.25 319 Z " fill="#6500FF" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="338.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">pScURA3</text>
+<path d="M 438.25 281 L 522.25 281 L 544.25 300 L 522.25 319 L 438.25 319 Z " fill="#F9AC2F" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="491.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="middle">URA3</text>
 <path d="M 643.75 300 L 643.75 256 M 621.75 256 L 665.75 256" fill="none" stroke="#FF6D8E" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="643.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">ScURA3</text>
-<text x="643.75" y="402" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">Terminator</text>
+<text x="643.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">tScURA3</text>
 <path d="M 772.25 300 C 772.25 286.745 782.995 276 796.25 276 C 809.505 276 820.25 286.745 820.25 300 C 820.25 313.255 809.505 324 796.25 324 C 782.995 324 772.25 313.255 772.25 300 Z " fill="#FFFFFF" stroke="#6FC0A9" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="796.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">2micron</text>
+<text x="796.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">2μ origin</text>
 <path d="M 928.75 277 L 968.75 300 L 928.75 323 Z " fill="#FFFFFF" stroke="#555656" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="948.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">FRT site</text>
-<path d="M 1154.25 319 L 1070.25 319 L 1048.25 300 L 1070.25 281 L 1154.25 281 Z " fill="#6500FF" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 1154.25 319 L 1070.25 319 L 1048.25 300 L 1070.25 281 L 1154.25 281 Z " fill="#8882BE" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="1101.25" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="middle">SpecR</text>
 <path d="M 1272.75 300 L 1272.75 342 L 1229.75 342 M 1243.75 354 L 1229.75 342 L 1243.75 330" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="1253.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">SpecR Promoter</text>
+<text x="1253.75" y="381" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">pSpecR</text>
 <path d="M 118 214 L 118 208" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 118 208 L 254.5 208" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 254.5 208 L 254.5 214" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
@@ -50,7 +48,7 @@
 <path d="M 595.5 538 L 602.5 552" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 602.5 538 L 609.5 552" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 744 545 C 744 558.255 733.255 569 720 569 C 706.745 569 696 558.255 696 545 C 696 531.745 706.745 521 720 521 C 733.255 521 744 531.745 744 545 Z " fill="#FFFFFF" stroke="#6FC0A9" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="720" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">pBBR1</text>
+<text x="720" y="626" fill="#333333" font-family="Arial, sans-serif" font-size="17" font-weight="400" text-anchor="middle">pBBR1 origin</text>
 <path d="M 630.5 459 L 630.5 453" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 630.5 453 L 809.5 453" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 809.5 453 L 809.5 459" fill="none" stroke="#E2D6FF" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>

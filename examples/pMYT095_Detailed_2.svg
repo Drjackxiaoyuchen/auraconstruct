@@ -20,16 +20,16 @@
 <text x="262.5" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">RBS</text>
 <text x="262.5" y="375" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">5,442..5,477 / 36 bp / strand +</text>
 <text x="262.5" y="393" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Ribosome entry site / gRNA processing /…</text>
-<path d="M 511.5 231 L 601.5 231 L 623.5 250 L 601.5 269 L 511.5 269 Z " fill="#6500FF" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 511.5 231 L 601.5 231 L 623.5 250 L 601.5 269 L 511.5 269 Z " fill="#6FC0A9" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="567.5" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="middle">sfGFP</text>
 <text x="567.5" y="375" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">5,478..6,194 / 717 bp / strand +</text>
 <text x="567.5" y="393" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Coding sequence / gRNA processing / dropout</text>
 <path d="M 872.5 250 L 872.5 206 M 850.5 206 L 894.5 206" fill="none" stroke="#FF6D8E" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="872.5" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">BBa_B0015 Terminator</text>
+<text x="872.5" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">B0015</text>
 <text x="872.5" y="375" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">6,195..6,323 / 129 bp / strand +</text>
 <text x="872.5" y="393" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Terminator / gRNA processing / dropout</text>
 <path d="M 1139.5 250 L 1139.5 235 C 1145.5 215 1151.5 245 1158.5 229 C 1165.5 212 1170.5 245 1177.5 229 C 1184.5 212 1189.5 245 1196.5 229 C 1203.5 212 1209.5 245 1215.5 235 L 1215.5 250 Z " fill="#FFFFFF" stroke="#555656" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="1177.5" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">Cas9 gRNA scaffold</text>
+<text x="1177.5" y="329" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">gRNA scaffold</text>
 <text x="1177.5" y="375" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">6,324..6,399 / 76 bp / strand +</text>
 <text x="1177.5" y="393" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">gRNA scaffold / gRNA processing / dropout</text>
 <text x="1177.5" y="414" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Cas9 guide RNA scaffold.</text>
@@ -39,21 +39,21 @@
 <path d="M 1345 518 L 1352 532" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 1352 518 L 1359 532" fill="none" stroke="#707684" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M 224.5 525 L 224.5 510 C 230.5 490 236.5 520 243.5 504 C 250.5 487 255.5 520 262.5 504 C 269.5 487 274.5 520 281.5 504 C 288.5 487 294.5 520 300.5 510 L 300.5 525 Z " fill="#FFFFFF" stroke="#555656" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="262.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">tCCC</text>
+<text x="262.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">tRNA (tCCC)</text>
 <text x="262.5" y="650" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">6,400..6,481 / 82 bp / strand +</text>
 <text x="262.5" y="668" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">tRNA annotation / gRNA processing / dropout</text>
 <text x="262.5" y="689" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">tRNA region of the gRNA processing</text>
 <text x="262.5" y="705" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">cassette.</text>
 <path d="M 548.5 525 L 548.5 483 L 591.5 483 M 577.5 471 L 591.5 483 L 577.5 495" fill="none" stroke="#4200AC" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="567.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">SbTDH3 Promoter</text>
+<text x="567.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">pSbTDH3</text>
 <text x="567.5" y="650" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">6,482..6,955 / 474 bp / strand +</text>
 <text x="567.5" y="668" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Promoter / gRNA processing / dropout</text>
-<path d="M 816.5 506 L 906.5 506 L 928.5 525 L 906.5 544 L 816.5 544 Z " fill="#6500FF" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M 816.5 506 L 906.5 506 L 928.5 525 L 906.5 544 L 816.5 544 Z " fill="#FF6D8E" stroke="#333333" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
 <text x="872.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="middle">mScarlet</text>
 <text x="872.5" y="650" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">6,956..7,654 / 699 bp / strand +</text>
 <text x="872.5" y="668" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Coding sequence / gRNA processing / dropout</text>
 <path d="M 1177.5 525 L 1177.5 481 M 1155.5 481 L 1199.5 481" fill="none" stroke="#FF6D8E" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
-<text x="1177.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">ScRPL15A Terminator</text>
+<text x="1177.5" y="604" fill="#333333" font-family="Arial, sans-serif" font-size="18" font-weight="400" text-anchor="middle">tScRPL15A</text>
 <text x="1177.5" y="650" fill="#707684" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">7,655..7,803 / 149 bp / strand +</text>
 <text x="1177.5" y="668" fill="#4200AC" font-family="Arial, sans-serif" font-size="12" font-weight="400" text-anchor="middle">Terminator / gRNA processing / dropout</text>
 </svg>

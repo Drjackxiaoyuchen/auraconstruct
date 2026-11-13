@@ -20,7 +20,7 @@ def main():
     export=sub.add_parser("export",help="Export one or more sequence files")
     export.add_argument("inputs",nargs="+",type=Path)
     export.add_argument("-o","--output",type=Path,required=True)
-    export.add_argument("--layout",choices=["schematic","proportional"],default="schematic")
+    export.add_argument("--layout",choices=["singleline","schematic","proportional"],default="singleline")
     export.add_argument("--palette",choices=["aureka","paper","colorblind","mono"],default="aureka")
     export.add_argument("--coordinates",action="store_true")
     export.add_argument("--detail",choices=["overview","detailed"],default="detailed")
