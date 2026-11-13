@@ -25,6 +25,8 @@ def load_demo(demo_id):
         raise ValueError("The bundled demo file does not match its recorded checksum.")
     c = read_bytes(data, entry["file"])[0]
     c.name = entry["plasmid"]
+    if entry.get("description"):
+        c.description = entry["description"]
     c.provenance = {k:v for k,v in entry.items() if k not in ("display_overrides", "file")}
     for f in c.features:
         override = entry.get("display_overrides", {}).get(f.id, {})

@@ -57,11 +57,11 @@ function input(value,change,placeholder=''){
 }
 function updateTable(){
   const c=current();if(!c)return;
-  $('featureCount').textContent=c.features.length;
+  updateVisibilityCount();
   const search=$('featureSearch').value.toLowerCase();
   const rows=c.features.filter(f=>`${f.label} ${f.role} ${f.module} ${f.source}`.toLowerCase().includes(search)).map(f=>{
     const row=document.createElement('tr');
-    const shown=document.createElement('input');shown.type='checkbox';shown.checked=f.visible;shown.setAttribute('aria-label',`Show ${f.label}`);shown.addEventListener('change',()=>{f.visible=shown.checked;scheduleRender();});row.append(td(shown));
+    const shown=document.createElement('input');shown.type='checkbox';shown.checked=f.visible;shown.setAttribute('aria-label',`Show ${f.label}`);shown.addEventListener('change',()=>{f.visible=shown.checked;updateVisibilityCount();scheduleRender();});row.append(td(shown));
     const label=input(f.label,v=>{f.label=v;scheduleRender();});label.maxLength=240;label.setAttribute('aria-label','Feature label');row.append(td(label));
     const glyph=document.createElement('select');glyph.setAttribute('aria-label','Glyph role');
     for(const [role,name] of Object.entries(roles)){glyph.add(new Option(name,role));}glyph.value=f.role;
@@ -73,7 +73,12 @@ function updateTable(){
     const evidence=document.createElement('span');evidence.className='evidence'+(f.role_source==='label-heuristic'?' heuristic':'');evidence.textContent=`${f.source} / ${f.role_source}`;evidence.title=`Original type: ${f.type}\n${JSON.stringify(f.qualifiers,null,2)}`;row.append(td(evidence));return row;
   });
   $('featureTable').replaceChildren(...rows);
+}
+function updateVisibilityCount(){
+  const c=current();if(!c)return;
+  $('featureCount').textContent=`${c.features.filter(f=>f.visible).length} / ${c.features.length}`;
   $('selectAll').checked=c.features.every(f=>f.visible);
+  $('selectAll').indeterminate=c.features.some(f=>f.visible)&&!$('selectAll').checked;
 }
 async function importFiles(files){
   if(!files.length)return;notice('Reading sequence files…');
@@ -91,7 +96,11 @@ async function exportFile(fmt){
   const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   notice(fmt==='pptx'?'PowerPoint exported. Select a part group, then Ungroup to edit its individual strokes and label.':'Export ready.');
 }
-$('loadDemo').addEventListener('click',guarded(async()=>{const res=await fetch(`/api/demo?id=${encodeURIComponent($('demoSelect').value)}`);if(!res.ok)throw Error((await res.json()).error);const data=await res.json();setRecords(data.records);notice('Public toolkit plasmid loaded. Review the source annotation and display choices before exporting.');}));
+async function loadPublicDemo(id){
+  const res=await fetch(`/api/demo?id=${encodeURIComponent(id)}`);if(!res.ok)throw Error((await res.json()).error);
+  const data=await res.json();setRecords(data.records);notice('Public toolkit plasmid loaded. Review the source annotation and display choices before exporting.');
+}
+$('loadDemo').addEventListener('click',guarded(() => loadPublicDemo($('demoSelect').value)));
 $('fileInput').addEventListener('change',guarded(e=>importFiles([...e.target.files])));
 const drop=$('dropzone');for(const name of ['dragenter','dragover'])drop.addEventListener(name,e=>{e.preventDefault();drop.classList.add('drag');});
 for(const name of ['dragleave','drop'])drop.addEventListener(name,e=>{e.preventDefault();drop.classList.remove('drag');});
@@ -135,4 +144,13 @@ $('featureForm').addEventListener('submit',guarded(async e=>{
   current().features.push({id:`user-${crypto.randomUUID()}`,label:v.label,type:'misc_feature',role:v.role,segments:[[a,b]],strand:Number(v.strand),source:'user-added',role_source:'user-assigned',qualifiers:{},color:null,visible:true,module:'',fuzzy:false});
   updateTable();scheduleRender();$('addDialog').close();e.target.reset();
 }));
-guarded(async()=>{const res=await fetch('/api/status');const s=await res.json();palettes=s.palettes||palettes;roleColorIndices=s.role_color_indices||roleColorIndices;$('version').textContent=`v${s.version}`;$('plannotate').disabled=!s.plannotate;$('annotationStatus').textContent=s.plannotate?'pLannotate found locally. Database readiness is checked when run.':'pLannotate is optional and not installed. Exact reference matching is ready.';})();
+guarded(async()=>{
+  const res=await fetch('/api/status');const s=await res.json();palettes=s.palettes||palettes;roleColorIndices=s.role_color_indices||roleColorIndices;
+  $('version').textContent=`v${s.version}`;$('plannotate').disabled=!s.plannotate;$('annotationStatus').textContent=s.plannotate?'pLannotate found locally. Database readiness is checked when run.':'pLannotate is optional and not installed. Exact reference matching is ready.';
+  const params=new URLSearchParams(location.search),demo=params.get('demo');
+  if(demo&&[...$('demoSelect').options].some(o=>o.value===demo)){
+    $('demoSelect').value=demo;
+    if(['overview','detailed'].includes(params.get('detail'))){state.options.detail=params.get('detail');$('detail').value=state.options.detail;}
+    await loadPublicDemo(demo);
+  }
+})();

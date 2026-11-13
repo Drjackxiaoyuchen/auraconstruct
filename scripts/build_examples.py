@@ -30,3 +30,15 @@ for demo_id in ('myt075','myt095'):
  for i,p in enumerate(pages,1):
   (out/f'{c.name}_Detailed_{i}.svg').write_text(to_svg(p))
 (out/'AuraConstruct_Detailed_MYT_Annotations.pptx').write_bytes(to_pptx(detailed))
+
+# Dense real-world source: one readable architecture slide, then every annotation.
+core=load_demo('ysd328')
+overview=build_pages(core,coordinates=True)
+full=load_demo('ysd328-all')
+annotations=build_pages(full,detail='detailed')
+(out/'AuraConstruct_Complex_YSD328.pptx').write_bytes(to_pptx(overview+annotations))
+(out/'pYSD328_Overview.svg').write_text(to_svg(overview[0]))
+(out/'pYSD328_All_Annotations.pptx').write_bytes(to_pptx(annotations))
+for i,p in enumerate(annotations,1):
+ (out/f'pYSD328_Detailed_{i}.svg').write_text(to_svg(p))
+print(f'Complex construct: {len(overview)} overview + {len(annotations)} detailed slides; {len(full.features)} source annotations')

@@ -510,5 +510,711 @@
         "module": "Bacterial backbone"
       }
     }
+  },
+  {
+    "plasmid": "pYSD328",
+    "file": "pYSD328.gb",
+    "source_url": "https://www.addgene.org/253040/",
+    "kit_url": "https://www.addgene.org/kits/young-moclo-ysd2/",
+    "download_url": "https://ndownloader.figshare.com/files/63969812",
+    "doi": "10.1021/acssynbio.6c00085",
+    "authors": "Juric V, Erwin LG, O’Riordan NM, Maher E, Holmes JD, Young PW",
+    "license": "CC BY-NC 4.0 (Figshare supplementary data)",
+    "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "display_citation": "Public demo: pYSD328 / Addgene #253040 / Juric et al., 2026 / doi:10.1021/acssynbio.6c00085",
+    "archive_member": "pYSD328  pYSD099-pYTK013-pYSD001-pYSD861-ALFAtag_Nb-pYSD085-pYTK066.gb",
+    "file_sha256": "b9f74377c132a3f7a8cad07a279edd81d5b5d4d64f2b70be50b41e49645a4800",
+    "sequence_sha256": "cee1a600c2c2f4eea8e98b90021fa17f1dc72e3d2ad033866f47f5fbf69e144b",
+    "retrieved": "2026-11-13",
+    "length": 8197,
+    "description": "Assembled yeast-display vector; fusion subregions overlap the parent CDS. 70 source annotations, not 70 independent genes.",
+    "id": "ysd328",
+    "title": "YSD 2.0 / pYSD328 · presentation selection",
+    "display_overrides": {
+      "f1": {
+        "module": "Assembly connector",
+        "visible": false
+      },
+      "f2": {
+        "module": "Assembly connector",
+        "visible": false
+      },
+      "f3": {
+        "module": "Assembly connector",
+        "visible": false
+      },
+      "f4": {
+        "module": "Assembly connector",
+        "visible": false
+      },
+      "f5": {
+        "module": "Assembly connector",
+        "visible": false
+      },
+      "f6": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "ScTEF1 promoter"
+      },
+      "f7": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f8": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f9": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "Aga2 signal peptide",
+        "caption": "N-terminal signal peptide region within the source display fusion CDS (905–3487).",
+        "color": "#8882BE"
+      },
+      "f10": {
+        "module": "Display fusion",
+        "visible": false,
+        "label": "Display fusion CDS",
+        "caption": "Parent fusion annotation overlaps the signal peptide, nanobody, tags, stalk and anchor."
+      },
+      "f11": {
+        "module": "Display fusion",
+        "visible": false,
+        "role": "region"
+      },
+      "f12": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f13": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f14": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "Anti-ALFA nanobody",
+        "caption": "Anti-ALFA-tag nanobody in the assembled display fusion; illustration role curated from source identity.",
+        "role": "cds",
+        "color": "#6500FF"
+      },
+      "f15": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f16": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f17": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f18": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "GS linker",
+        "caption": "Glycine/serine linker region within the display fusion.",
+        "color": "#F9AC2F"
+      },
+      "f19": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f20": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f21": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f22": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "HA tag",
+        "caption": "HA epitope tag within the display fusion.",
+        "color": "#FF6D8E"
+      },
+      "f23": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f24": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f25": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f26": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f27": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f28": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f29": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "TEV protease site",
+        "caption": "Protein protease-recognition region; not a DNA nuclease cleavage site.",
+        "color": "#F9AC2F",
+        "role": "region"
+      },
+      "f30": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f31": {
+        "module": "Display fusion",
+        "visible": false,
+        "role": "region"
+      },
+      "f32": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "649 stalk",
+        "caption": "649-stalk region of the same display fusion CDS.",
+        "color": "#4200AC"
+      },
+      "f33": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f34": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f35": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f36": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f37": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f38": {
+        "module": "Display fusion",
+        "visible": false,
+        "role": "region"
+      },
+      "f39": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "GPI anchor",
+        "caption": "C-terminal GPI-anchor region of the same display fusion CDS.",
+        "color": "#6FC0A9"
+      },
+      "f40": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f41": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f42": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f43": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f44": {
+        "module": "Display fusion",
+        "visible": false
+      },
+      "f45": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "ScTDH1 terminator"
+      },
+      "f46": {
+        "module": "Assembly connector",
+        "visible": false
+      },
+      "f47": {
+        "module": "Assembly connector",
+        "visible": false
+      },
+      "f48": {
+        "module": "Assembly connector",
+        "visible": false
+      },
+      "f49": {
+        "module": "Assembly connector",
+        "visible": false
+      },
+      "f50": {
+        "module": "Assembly connector",
+        "visible": false
+      },
+      "f51": {
+        "module": "Yeast selection",
+        "visible": false,
+        "role": "region",
+        "caption": "Parent selection region includes the LEU2 promoter, CDS and terminator; it is not an additional CDS."
+      },
+      "f52": {
+        "module": "Yeast selection",
+        "visible": true,
+        "label": "LEU2 promoter"
+      },
+      "f53": {
+        "module": "Yeast selection",
+        "visible": false
+      },
+      "f54": {
+        "module": "Yeast selection",
+        "visible": true,
+        "label": "LEU2"
+      },
+      "f55": {
+        "module": "Yeast selection",
+        "visible": true,
+        "label": "LEU2 terminator"
+      },
+      "f56": {
+        "module": "Bacterial backbone",
+        "visible": false,
+        "caption": "Approximate source coverage annotation; its 802 bp span is not an oligonucleotide length.",
+        "role": "region",
+        "label": "AmpR reverse coverage (approx.)"
+      },
+      "f57": {
+        "module": "Yeast maintenance",
+        "visible": false,
+        "role": "region"
+      },
+      "f58": {
+        "module": "Yeast maintenance",
+        "visible": true,
+        "label": "CEN6",
+        "caption": "Centromeric sequence. Imported type is rep_origin; display role curated as an unspecified region.",
+        "role": "region",
+        "color": "#6FC0A9"
+      },
+      "f59": {
+        "module": "Yeast maintenance",
+        "visible": true,
+        "label": "ARS4"
+      },
+      "f60": {
+        "module": "Bacterial backbone",
+        "visible": false,
+        "role": "region"
+      },
+      "f61": {
+        "module": "Bacterial backbone",
+        "visible": false
+      },
+      "f62": {
+        "module": "Bacterial backbone",
+        "visible": false
+      },
+      "f63": {
+        "module": "Bacterial backbone",
+        "visible": true,
+        "label": "AmpR",
+        "caption": "Reverse-strand bacterial selection CDS. Its promoter and terminator remain in the full annotation view."
+      },
+      "f64": {
+        "module": "Bacterial backbone",
+        "visible": false,
+        "caption": "Approximate source coverage annotation; its 800 bp span is not an oligonucleotide length.",
+        "role": "region",
+        "label": "AmpR forward coverage (approx.)"
+      },
+      "f65": {
+        "module": "Bacterial backbone",
+        "visible": false
+      },
+      "f66": {
+        "module": "Bacterial backbone",
+        "visible": true,
+        "label": "ColE1"
+      },
+      "f67": {
+        "module": "Bacterial backbone",
+        "visible": false
+      },
+      "f68": {
+        "module": "Bacterial backbone",
+        "visible": false
+      },
+      "f69": {
+        "module": "Bacterial backbone",
+        "visible": false
+      },
+      "f70": {
+        "module": "Bacterial backbone",
+        "visible": false
+      }
+    }
+  },
+  {
+    "plasmid": "pYSD328",
+    "file": "pYSD328.gb",
+    "source_url": "https://www.addgene.org/253040/",
+    "kit_url": "https://www.addgene.org/kits/young-moclo-ysd2/",
+    "download_url": "https://ndownloader.figshare.com/files/63969812",
+    "doi": "10.1021/acssynbio.6c00085",
+    "authors": "Juric V, Erwin LG, O’Riordan NM, Maher E, Holmes JD, Young PW",
+    "license": "CC BY-NC 4.0 (Figshare supplementary data)",
+    "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "display_citation": "Public demo: pYSD328 / Addgene #253040 / Juric et al., 2026 / doi:10.1021/acssynbio.6c00085",
+    "archive_member": "pYSD328  pYSD099-pYTK013-pYSD001-pYSD861-ALFAtag_Nb-pYSD085-pYTK066.gb",
+    "file_sha256": "b9f74377c132a3f7a8cad07a279edd81d5b5d4d64f2b70be50b41e49645a4800",
+    "sequence_sha256": "cee1a600c2c2f4eea8e98b90021fa17f1dc72e3d2ad033866f47f5fbf69e144b",
+    "retrieved": "2026-11-13",
+    "length": 8197,
+    "description": "Assembled yeast-display vector; fusion subregions overlap the parent CDS. 70 source annotations, not 70 independent genes.",
+    "id": "ysd328-all",
+    "title": "YSD 2.0 / pYSD328 · all 70 annotations",
+    "display_overrides": {
+      "f1": {
+        "module": "Assembly connector",
+        "visible": true
+      },
+      "f2": {
+        "module": "Assembly connector",
+        "visible": true
+      },
+      "f3": {
+        "module": "Assembly connector",
+        "visible": true
+      },
+      "f4": {
+        "module": "Assembly connector",
+        "visible": true
+      },
+      "f5": {
+        "module": "Assembly connector",
+        "visible": true
+      },
+      "f6": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "ScTEF1 promoter"
+      },
+      "f7": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f8": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f9": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "Aga2 signal peptide",
+        "caption": "N-terminal signal peptide region within the source display fusion CDS (905–3487).",
+        "color": "#8882BE"
+      },
+      "f10": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "Display fusion CDS",
+        "caption": "Parent fusion annotation overlaps the signal peptide, nanobody, tags, stalk and anchor."
+      },
+      "f11": {
+        "module": "Display fusion",
+        "visible": true,
+        "role": "region"
+      },
+      "f12": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f13": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f14": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "Anti-ALFA nanobody",
+        "caption": "Anti-ALFA-tag nanobody in the assembled display fusion; illustration role curated from source identity.",
+        "role": "cds",
+        "color": "#6500FF"
+      },
+      "f15": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f16": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f17": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f18": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "GS linker",
+        "caption": "Glycine/serine linker region within the display fusion.",
+        "color": "#F9AC2F"
+      },
+      "f19": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f20": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f21": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f22": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "HA tag",
+        "caption": "HA epitope tag within the display fusion.",
+        "color": "#FF6D8E"
+      },
+      "f23": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f24": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f25": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f26": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f27": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f28": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f29": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "TEV protease site",
+        "caption": "Protein protease-recognition region; not a DNA nuclease cleavage site.",
+        "color": "#F9AC2F",
+        "role": "region"
+      },
+      "f30": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f31": {
+        "module": "Display fusion",
+        "visible": true,
+        "role": "region"
+      },
+      "f32": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "649 stalk",
+        "caption": "649-stalk region of the same display fusion CDS.",
+        "color": "#4200AC"
+      },
+      "f33": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f34": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f35": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f36": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f37": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f38": {
+        "module": "Display fusion",
+        "visible": true,
+        "role": "region"
+      },
+      "f39": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "GPI anchor",
+        "caption": "C-terminal GPI-anchor region of the same display fusion CDS.",
+        "color": "#6FC0A9"
+      },
+      "f40": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f41": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f42": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f43": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f44": {
+        "module": "Display fusion",
+        "visible": true
+      },
+      "f45": {
+        "module": "Display fusion",
+        "visible": true,
+        "label": "ScTDH1 terminator"
+      },
+      "f46": {
+        "module": "Assembly connector",
+        "visible": true
+      },
+      "f47": {
+        "module": "Assembly connector",
+        "visible": true
+      },
+      "f48": {
+        "module": "Assembly connector",
+        "visible": true
+      },
+      "f49": {
+        "module": "Assembly connector",
+        "visible": true
+      },
+      "f50": {
+        "module": "Assembly connector",
+        "visible": true
+      },
+      "f51": {
+        "module": "Yeast selection",
+        "visible": true,
+        "role": "region",
+        "caption": "Parent selection region includes the LEU2 promoter, CDS and terminator; it is not an additional CDS."
+      },
+      "f52": {
+        "module": "Yeast selection",
+        "visible": true,
+        "label": "LEU2 promoter"
+      },
+      "f53": {
+        "module": "Yeast selection",
+        "visible": true
+      },
+      "f54": {
+        "module": "Yeast selection",
+        "visible": true,
+        "label": "LEU2"
+      },
+      "f55": {
+        "module": "Yeast selection",
+        "visible": true,
+        "label": "LEU2 terminator"
+      },
+      "f56": {
+        "module": "Bacterial backbone",
+        "visible": true,
+        "caption": "Approximate source coverage annotation; its 802 bp span is not an oligonucleotide length.",
+        "role": "region",
+        "label": "AmpR reverse coverage (approx.)"
+      },
+      "f57": {
+        "module": "Yeast maintenance",
+        "visible": true,
+        "role": "region"
+      },
+      "f58": {
+        "module": "Yeast maintenance",
+        "visible": true,
+        "label": "CEN6",
+        "caption": "Centromeric sequence. Imported type is rep_origin; display role curated as an unspecified region.",
+        "role": "region",
+        "color": "#6FC0A9"
+      },
+      "f59": {
+        "module": "Yeast maintenance",
+        "visible": true,
+        "label": "ARS4"
+      },
+      "f60": {
+        "module": "Bacterial backbone",
+        "visible": true,
+        "role": "region"
+      },
+      "f61": {
+        "module": "Bacterial backbone",
+        "visible": true
+      },
+      "f62": {
+        "module": "Bacterial backbone",
+        "visible": true
+      },
+      "f63": {
+        "module": "Bacterial backbone",
+        "visible": true,
+        "label": "AmpR",
+        "caption": "Reverse-strand bacterial selection CDS. Its promoter and terminator remain in the full annotation view."
+      },
+      "f64": {
+        "module": "Bacterial backbone",
+        "visible": true,
+        "caption": "Approximate source coverage annotation; its 800 bp span is not an oligonucleotide length.",
+        "role": "region",
+        "label": "AmpR forward coverage (approx.)"
+      },
+      "f65": {
+        "module": "Bacterial backbone",
+        "visible": true
+      },
+      "f66": {
+        "module": "Bacterial backbone",
+        "visible": true,
+        "label": "ColE1"
+      },
+      "f67": {
+        "module": "Bacterial backbone",
+        "visible": true
+      },
+      "f68": {
+        "module": "Bacterial backbone",
+        "visible": true
+      },
+      "f69": {
+        "module": "Bacterial backbone",
+        "visible": true
+      },
+      "f70": {
+        "module": "Bacterial backbone",
+        "visible": true
+      }
+    }
   }
 ]

@@ -27,9 +27,19 @@ Open [the local studio](http://127.0.0.1:8741). On macOS, `launch.command` start
 4. Export **PowerPoint**. Select a named feature group and ungroup it to edit individual glyph strokes or text. Copy groups into your own deck.
 5. **Save project** preserves all loaded constructs and illustration settings. **Open project** restores them. **Export all constructs** combines figures into one PPTX.
 
-The studio includes real public **YTK pYTK001**, **MYT pMYT001/pMYT075/pMYT095**, and **YSD 2.0 pYSD891** examples, with source links, checksums and recorded display curation. The random-DNA fixture remains for tests. See [public demo provenance and data licenses](docs/PUBLIC_DEMOS.md).
+The studio includes real public **YTK pYTK001**, **MYT pMYT001/pMYT075/pMYT095**, and **YSD 2.0 pYSD891/pYSD328** examples, with source links, checksums and recorded display curation. The random-DNA fixture remains for tests. See [public demo provenance and data licenses](docs/PUBLIC_DEMOS.md).
 
-## What works in v0.3
+## Complex construct demo
+
+![pYSD328 presentation map](examples/pYSD328_Overview.svg)
+
+**pYSD328: 8,197 bp, 70 source annotations**, including an assembled nanobody-display fusion, overlapping protein regions, tags, primers, yeast selection/maintenance and a reverse-strand bacterial cassette. These are 70 annotations, not 70 separate genes. Two presets offer a 16-part presentation selection and all 70 annotations. Use **Overview** for the whole selected construct or **Detailed** for positions, lengths and callouts.
+
+[Download the editable 10-slide complex demo](examples/AuraConstruct_Complex_YSD328.pptx): one selected overview plus nine full-detail slides. [Source and display decisions](docs/PUBLIC_DEMOS.md#complex-construct-demo).
+
+With the studio running, [open the selected overview](http://127.0.0.1:8741/?demo=ysd328&detail=overview) or [all 70 detailed annotations](http://127.0.0.1:8741/?demo=ysd328-all). These links load the bundled public example automatically.
+
+## What works in v0.4
 
 | Area | Support |
 | --- | --- |

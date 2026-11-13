@@ -151,7 +151,7 @@ def _header(c, page_number, page_count, layout, selected):
     title = c.name if len(c.name) <= 70 else c.name[:67] + "..."
     p = Page(title)
     p.text(title, 74, 43, 1288, 33, bold=True, h=48)
-    p.text(f"{c.length:,} bp   /   {c.topology} DNA   /   {selected} illustrated features", 76, 98, 1280, 17, MUTED)
+    p.text(f"{c.length:,} bp   /   {c.topology} DNA   /   {selected} of {len(c.features)} features shown", 76, 98, 1280, 17, MUTED)
     if c.description:
         p.text(textwrap.shorten(c.description,width=160,placeholder="…"),76,120,1288,12,MUTED)
     p.line(76, 141, 1364, 141, FAINT, 1)
@@ -184,6 +184,10 @@ def _coordinate(f):
 def _feature_notes(p, features):
     for f in features:
         p.notes += f"\n{f.id}: {f.label}; {_coordinate(f)}; role={f.role}; role source={f.role_source}; annotation source={f.source}"
+        original=f.qualifiers.get("label",[])
+        if isinstance(original,str):original=[original]
+        if original and " / ".join(original)!=f.label:
+            p.notes += "; original label: " + " / ".join(original)
         caption, caption_source=summary(f)
         if caption:p.notes += f"; caption ({caption_source}): {caption}"
 

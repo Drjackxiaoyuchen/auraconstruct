@@ -189,7 +189,7 @@ def test_plannotate_adapter_merges_and_preserves_imports(monkeypatch):
     assert result.sequence==c.sequence
 
 
-@pytest.mark.parametrize("demo_id",["ytk001","myt001","myt075","myt095","ysd891"])
+@pytest.mark.parametrize("demo_id",["ytk001","myt001","myt075","myt095","ysd891","ysd328","ysd328-all"])
 def test_public_demo_provenance_and_export(demo_id):
     import hashlib
     from auraconstruct.demos import load_demo
@@ -226,6 +226,30 @@ def test_detailed_captions_and_short_sequences_keep_their_sources():
     assert short_sequence(c,site)=='5′ ATGC 3′'
     # A label alone does not establish an exact cleavage coordinate or overhang.
     assert infer_role('protein_bind',{},'BsaI')==('generic','feature-type')
+
+
+def test_dense_public_construct_keeps_overlaps_and_every_source_feature():
+    from auraconstruct.demos import load_demo
+    core,full=load_demo('ysd328'),load_demo('ysd328-all')
+    assert full.sequence==core.sequence and full.length==8197
+    assert len(full.features)==len(core.features)==70
+    assert sum(f.visible for f in core.features)==16
+    assert all(f.visible for f in full.features)
+    # Source parent CDS and its overlapping components are not collapsed or counted as genes.
+    assert next(f for f in full.features if f.id=='f10').segments==[[904,3487]]
+    assert next(f for f in full.features if f.id=='f14').segments==[[961,1333]]
+    assert next(f for f in full.features if f.id=='f58').role_source=='demo-curated'
+    for detail,expected in [('overview',5),('detailed',9)]:
+        pages=build_pages(full,detail=detail,coordinates=True)
+        assert len(pages)==expected
+        groups=[{s.group for s in p.items if s.group} for p in pages]
+        assert set.union(*groups)=={f.id for f in full.features}
+        assert sum(map(len,groups))==70  # Exactly one schematic group per source feature.
+        assert all(s.x>=0 and s.y>=0 and s.x+s.w<=W+1 and s.y+s.h<=H+1 for p in pages for s in p.items)
+    project=from_dict(core.to_dict())
+    assert sum(f.visible for f in project.features)==16 and len(project.features)==70
+    pages=build_pages(full,layout='proportional',detail='detailed')
+    assert {s.group for p in pages for s in p.items if s.group}=={f.id for f in full.features}
 
 
 def test_detailed_mode_has_coordinates_notes_and_native_objects():
