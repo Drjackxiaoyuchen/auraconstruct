@@ -26,6 +26,8 @@ GenBank / SnapGene / FASTA / EMBL / raw DNA
 - `demos.py`: checked public examples and display presets.
 - `details.py`: annotation categories, source summaries and short stored feature sequences.
 - `scene.py`: shared primitives, glyphs, layout, pagination and SVG.
+- `engine.py`: isolated pLannotate executable/search-tool/database readiness checks.
+- `library.py`: private SQLite source/record/part/observation store and exact-reference export.
 - `singleline.py`: one sequence-scaled backbone, collision-free label tiers and explicit module brackets; no construct wrapping or pagination.
 - `pptx.py`: native paths, text boxes, named feature groups, notes and PowerPoint package relationships.
 - `server.py`: loopback-only Flask interface; uploaded files are not persisted.

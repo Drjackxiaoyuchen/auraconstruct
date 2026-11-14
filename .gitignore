@@ -9,3 +9,8 @@ dist/
 .codex-*/
 local-inputs/
 outputs/
+local-library/
+library-data/
+plannotate-env/
+*.sqlite3
+plannotate-databases-*.tar*

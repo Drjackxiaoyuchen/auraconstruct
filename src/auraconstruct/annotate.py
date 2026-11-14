@@ -3,12 +3,12 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
-import shutil
 import subprocess
 import tempfile
+from datetime import datetime, timezone
+import hashlib
 
 from Bio.Seq import Seq
-from Bio import SeqIO
 
 from .model import Feature, infer_role, validate
 from .sequence_io import read_bytes
@@ -22,14 +22,14 @@ def exact_annotate(construct, reference_bytes: bytes, reference_name: str):
     target = c.sequence + (c.sequence if c.topology == "circular" else "")
     existing = {(tuple(map(tuple, f.segments)), f.strand, f.label) for f in c.features}
     for ref in refs:
-        candidates = [(ref.name, ref.sequence, "misc_feature", {})] if not ref.features else []
+        candidates = [(ref.name, ref.sequence, "misc_feature", {}, None, None)] if not ref.features else []
         for f in ref.features:
             # Biopython extraction respects the biological order of join segments.
             strands = f.segment_strands or [f.strand]*len(f.segments)
             seq = "".join(ref.sequence[a:b] if strand != -1 else str(Seq(ref.sequence[a:b]).reverse_complement())
                           for (a, b),strand in zip(f.segments,strands))
-            candidates.append((f.label, seq, f.type, f.qualifiers))
-        for label, seq, kind, q in candidates:
+            candidates.append((f.label, seq, f.type, f.qualifiers, f.role, f.role_source))
+        for label, seq, kind, q, reference_role, reference_role_source in candidates:
             if len(seq) < 12 or len(seq) > n or any(x not in "ACGT" for x in seq):
                 continue
             reverse = str(Seq(seq).reverse_complement())
@@ -43,10 +43,10 @@ def exact_annotate(construct, reference_bytes: bytes, reference_name: str):
                         segments.reverse()
                     key = (tuple(map(tuple, segments)), strand, label)
                     if key not in existing:
-                        role, role_source = infer_role(kind, q, label)
+                        role, role_source = (reference_role,reference_role_source) if reference_role else infer_role(kind, q, label)
                         f = Feature(f"exact-{len(c.features) + 1}", label, kind, role, segments, strand,
                                     source=f"exact-reference:{Path(reference_name).name}", role_source=role_source,
-                                    qualifiers={**q, "note": ["Exact sequence match to user reference; function unverified."]})
+                                    qualifiers={**q, "note": [*q.get('note',[]), "Exact sequence match to user reference; function unverified."]})
                         c.features.append(f)
                         existing.add(key)
                     if len(c.features) > 5000:
@@ -58,24 +58,26 @@ def exact_annotate(construct, reference_bytes: bytes, reference_name: str):
 
 
 def plannotate_available():
-    return shutil.which("plannotate") is not None
+    from .engine import status
+    return status()['ready']
 
 
-def plannotate(construct, timeout=300):
-    executable = shutil.which("plannotate")
-    if not executable:
-        raise ValueError("pLannotate is not installed. See docs/ANNOTATION.md for its separate environment and database setup.")
+def plannotate(construct, timeout=600):
+    from . import engine
+    executable = engine.executable()
+    readiness=engine.status()
+    if not readiness['ready']:raise ValueError(readiness['reason'])
     c = deepcopy(construct)
     if c.topology == "unknown":
         raise ValueError("Set linear or circular topology before running pLannotate.")
     with tempfile.TemporaryDirectory(prefix="auraconstruct-") as tmp:
         source = Path(tmp) / "input.fa"
         source.write_text(f">construct\n{c.sequence}\n")
-        args = [executable, "batch", "-i", str(source), "-o", tmp, "-f", "annotated"]
+        args = [executable, "batch", "-i", str(source), "-o", tmp, "-f", "annotated", '--cores', '2']
         if c.topology == "linear":
             args.append("--linear")
         try:
-            result = subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=False)
+            result = subprocess.run(args, env=engine.environment(executable),capture_output=True, text=True, timeout=timeout, check=False)
         except subprocess.TimeoutExpired as exc:
             raise ValueError(f"pLannotate exceeded {timeout} seconds.") from exc
         if result.returncode:
@@ -92,6 +94,16 @@ def plannotate(construct, timeout=300):
                 continue
             f.id = f"plann-{len(c.features) + 1}"
             f.source = "pLannotate-prediction"
+            f.qualifiers.update(ac_engine_version=[readiness['version']],ac_db_version=[str(readiness['database_version'])],
+                                ac_db_fingerprint=[readiness['database_fingerprint']])
             c.features.append(f)
+        if c.features:c.warnings=[w for w in c.warnings if not w.startswith('No annotations found')]
         c.warnings.append("pLannotate annotations are sequence-similarity predictions. Review boundaries and function.")
+        if not c.features:c.warnings.append('pLannotate found no matching features in this sequence.')
+        runs=c.provenance.setdefault('annotation_runs',[])
+        runs.append({'engine':'pLannotate','version':readiness['version'],
+                     'database_version':readiness['database_version'],'database_fingerprint':readiness['database_fingerprint'],
+                     'time_utc':datetime.now(timezone.utc).isoformat(),'sequence_sha256':hashlib.sha256(c.sequence.encode()).hexdigest(),
+                     'topology':c.topology,'features_added':len(c.features)-len(construct.features),
+                     'reference':'https://doi.org/10.1093/nar/gkab374'})
     return validate(c)

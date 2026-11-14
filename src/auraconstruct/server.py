@@ -10,7 +10,7 @@ from flask import Flask, jsonify, request, send_file
 from werkzeug.exceptions import HTTPException
 
 from . import __version__
-from .annotate import exact_annotate, plannotate, plannotate_available
+from .annotate import exact_annotate, plannotate
 from .model import ROLES
 from .sequence_io import read_bytes, from_dict, to_genbank
 from .scene import build_pages, to_svg, PALETTES, COLORS
@@ -53,8 +53,11 @@ def create_app():
     @app.get("/api/status")
     def status():
         from .demos import catalog
-        return jsonify(version=__version__, plannotate=plannotate_available(), roles=ROLES,
-                       palettes=PALETTES, role_color_indices=COLORS, demos=catalog())
+        from .library import stats
+        from .engine import status as engine_status
+        engine=engine_status()
+        return jsonify(version=__version__, plannotate=engine['ready'],annotation_engine=engine, roles=ROLES,
+                       palettes=PALETTES, role_color_indices=COLORS, demos=catalog(),library=stats())
 
     @app.get("/api/demo")
     def demo():
@@ -84,9 +87,12 @@ def create_app():
     def annotate():
         if request.is_json:
             data=request.get_json()
-            if data.get("engine") != "plannotate":
-                raise ValueError("Choose the pLannotate engine.")
-            c = plannotate(from_dict(data["record"]))
+            if data.get('engine')=='library':
+                from .library import annotate_library
+                c=annotate_library(from_dict(data['record']))
+            elif data.get('engine')=='plannotate':
+                c = plannotate(from_dict(data["record"]))
+            else:raise ValueError("Choose pLannotate or the local library engine.")
         else:
             c = from_dict(json.loads(request.form["record"]))
             ref=request.files["reference"]

@@ -1,6 +1,6 @@
 # Roadmap
 
-The current deliverable is a working local v0.5 illustration tool. These items are future work, not completed capabilities.
+The current deliverable is a working local v0.6 illustration tool. These items are future work, not completed capabilities.
 
 ## Figure composition
 
@@ -14,7 +14,7 @@ The current deliverable is a working local v0.5 illustration tool. These items a
 
 - Full SBOL Visual conformance review, expanded role vocabulary and snapshot fixtures.
 - Optional SBOL3 data exchange with validation separate from illustration settings.
-- Versioned local reference libraries with explicit provenance and licensing.
+- Curated reference-library review UI and authorized incremental acquisition; the local SQLite/CLI foundation preserves source observations, aliases and licenses.
 - Live pLannotate integration CI using a controlled database snapshot.
 - Preservation of fuzzy-location classes in re-exported GenBank locations.
 

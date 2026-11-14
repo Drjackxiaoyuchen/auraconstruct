@@ -131,7 +131,15 @@ $('plannotate').addEventListener('click',guarded(async()=>{
   if(!current())throw Error('Load a construct first.');
   notice('Running pLannotate locally. Large databases may take several minutes…');
   $('plannotate').disabled=true;
-  try{const res=await api('/api/annotate',{record:current(),engine:'plannotate'});state.records[state.index]=(await res.json()).record;selectRecord(state.index);notice('pLannotate predictions added. Review their boundaries and roles.');}finally{$('plannotate').disabled=false;}
+  try{
+    const records=state.records,index=state.index,record=current(),snapshot=JSON.stringify(record),before=record.features.length;
+    const res=await api('/api/annotate',{record,engine:'plannotate'});const annotated=(await res.json()).record;
+    if(state.records!==records||records[index]!==record||JSON.stringify(record)!==snapshot){
+      throw Error('The input changed while pLannotate was running. Your edits were preserved; run annotation again on the current input.');
+    }
+    state.records[index]=annotated;if(state.index===index)selectRecord(index);
+    notice(`${record.name}: pLannotate finished with ${annotated.features.length-before} new predictions. Review boundaries, fragments and roles before exporting.`);
+  }finally{$('plannotate').disabled=false;}
 }));
 $('projectInput').addEventListener('change',guarded(async e=>{
   const file=e.target.files[0];if(!file)return;
@@ -151,7 +159,8 @@ $('featureForm').addEventListener('submit',guarded(async e=>{
 }));
 guarded(async()=>{
   const res=await fetch('/api/status');const s=await res.json();palettes=s.palettes||palettes;roleColorIndices=s.role_color_indices||roleColorIndices;
-  $('version').textContent=`v${s.version}`;$('plannotate').disabled=!s.plannotate;$('annotationStatus').textContent=s.plannotate?'pLannotate found locally. Database readiness is checked when run.':'pLannotate is optional and not installed. Exact reference matching is ready.';
+  $('version').textContent=`v${s.version}`;$('plannotate').disabled=!s.plannotate;
+  $('annotationStatus').textContent=s.plannotate?`${s.annotation_engine?.version||'pLannotate'} ready / database bundle ${s.annotation_engine?.database_version||'verified'}.`:(s.annotation_engine?.reason||'pLannotate is not ready. Exact reference matching is available.');
   const params=new URLSearchParams(location.search),demo=params.get('demo');
   if(['singleline','schematic','proportional'].includes(params.get('layout')))state.options.layout=params.get('layout');
   syncLayoutControls();

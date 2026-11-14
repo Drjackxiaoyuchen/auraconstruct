@@ -27,7 +27,26 @@ def main():
     export.add_argument("--annotate",choices=["plannotate"])
     export.add_argument("--reference",type=Path)
     export.add_argument("--topology",choices=["linear","circular"])
+    lib=sub.add_parser('library',help='Manage the private local DNA reference library')
+    libsub=lib.add_subparsers(dest='library_command',required=True)
+    for name in ('stats','seed-demos'):
+        p=libsub.add_parser(name);p.add_argument('--db',type=Path)
+    ingest=libsub.add_parser('ingest');ingest.add_argument('inputs',nargs='+',type=Path)
+    ingest.add_argument('--source-url',required=True);ingest.add_argument('--license',required=True,dest='license_notice')
+    ingest.add_argument('--access-note',default='');ingest.add_argument('--db',type=Path)
+    ref=libsub.add_parser('export');ref.add_argument('-o','--output',required=True,type=Path);ref.add_argument('--db',type=Path)
     args=parser.parse_args()
+    if args.command=='library':
+        from . import library
+        if args.library_command=='stats':result=library.stats(args.db)
+        elif args.library_command=='seed-demos':result=library.seed_demos(args.db)
+        elif args.library_command=='export':
+            raw,revision=library.reference_genbank(args.db);args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_bytes(raw)
+            result={'output':str(args.output),'revision':revision}
+        else:
+            result=[library.ingest(p.read_bytes(),p.name,source_url=args.source_url,license_notice=args.license_notice,
+                                   access_note=args.access_note,path=args.db) for p in args.inputs]
+        print(json.dumps(result,indent=2));return
     if args.command=="serve":
         from .server import create_app
         if not args.no_browser:

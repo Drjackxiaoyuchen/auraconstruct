@@ -169,14 +169,15 @@ def test_web_import_render_export_and_project():
 
 
 def test_plannotate_missing_and_sequence_change_protection(monkeypatch):
-    monkeypatch.setattr('auraconstruct.annotate.shutil.which',lambda _:None)
+    monkeypatch.setattr('auraconstruct.engine.shutil.which',lambda *a,**k:None)
     with pytest.raises(ValueError,match='not installed'):plannotate(sample())
 
 
 def test_plannotate_adapter_merges_and_preserves_imports(monkeypatch):
     from types import SimpleNamespace
     c=sample()
-    monkeypatch.setattr('auraconstruct.annotate.shutil.which',lambda _:'/bin/plannotate')
+    monkeypatch.setattr('auraconstruct.engine.executable',lambda:'/bin/plannotate')
+    monkeypatch.setattr('auraconstruct.engine.status',lambda:{'ready':True,'version':'test','database_version':2,'database_fingerprint':'fixture'})
     def fake_run(args,**kwargs):
         out=Path(args[args.index('-o')+1])/'annotated_pLann.gbk'
         predicted=sample();predicted.features=[Feature('p1','Predicted ori','rep_origin','origin',[[3000,3200]],1)]

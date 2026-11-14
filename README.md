@@ -39,7 +39,7 @@ The studio includes real public **YTK pYTK001**, **MYT pMYT001/pMYT075/pMYT095**
 
 With the studio running, [open the single-line Cas9/gRNA demo](http://127.0.0.1:8741/?demo=myt095&layout=singleline), [selected YSD fusion](http://127.0.0.1:8741/?demo=ysd328&layout=singleline) or [all 70 annotations](http://127.0.0.1:8741/?demo=ysd328-all&layout=singleline). These links load the bundled public example automatically.
 
-## What works in v0.5
+## What works in v0.6
 
 | Area | Support |
 | --- | --- |
@@ -61,7 +61,7 @@ New sessions and CLI exports use Aureka’s 2026 purple, yellow, mint and pink p
 
 Existing GenBank/SnapGene annotations remain available without installing an annotation engine. Role assignments prefer feature types and Sequence Ontology terms. Label-based guesses are visibly marked `label-heuristic` in the table. Changing a glyph changes the illustration role, not the underlying DNA.
 
-For unannotated DNA, use **Match reference parts** with a trusted local part library, or install pLannotate. The reference matcher searches exact sequences on both strands and across the origin of circular DNA. It does not identify distant homologs or predict novel genes. Predicted annotations retain their source and do not replace imported features.
+For unannotated DNA, install the isolated pLannotate engine and databases with `.venv/bin/python scripts/setup_plannotate.py`, then choose **Run pLannotate** in the studio. This runs locally, preserves the input sequence and records prediction/database provenance. **Match reference parts** provides a separate exact-match route using a trusted local part library. The reference matcher searches exact sequences on both strands and across the origin of circular DNA. It does not identify distant homologs or predict novel genes. Predicted annotations retain their source and do not replace imported features.
 
 [pLannotate setup and annotation behavior](docs/ANNOTATION.md)
 
@@ -104,7 +104,7 @@ The useful gap is the editable PPTX workflow. The projects reviewed document str
 - Wrapped overview maps paginate at 16 features per slide; wrapped detailed maps use eight. Coordinate mode uses three or two lanes per slide respectively.
 - Input limit: 20 MB after decompression. This tool targets constructs and plasmids, rather than whole-genome annotation or assembly analysis.
 - SnapGene sequence and features are imported through Biopython. Proprietary history, enzyme catalogs and cloning operations are outside this version.
-- pLannotate integration requires its own installed tools and databases. The adapter is tested with a controlled executable result; a live pLannotate database run was not performed in the development environment.
+- pLannotate requires its own installed tools and databases. The live v2 engine was verified on sequence-only pYTK001 and pMYT095, including linear and origin-crossing cases, with unchanged DNA and native PPTX output. Predictions and fragment calls require review; this is not a claim of complete annotation accuracy.
 
 ## Development
 
