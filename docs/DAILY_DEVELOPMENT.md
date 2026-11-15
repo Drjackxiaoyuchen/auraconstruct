@@ -22,3 +22,5 @@ Collected data, engine databases, raw sequence files and credentials stay local,
 Record UTC retrieval times and local report dates, source URL/DOI, raw/sequence SHA-256, license/access status, new and duplicate record counts, unique parts versus source observations, annotation validation, code/test results and next work. Keep download attempts bounded with backoff. Record a blocked source rather than retrying it every day. Make one useful prioritized improvement when feasible; review and test changes before pushing authorized code/docs.
 
 The initial seed uses already bundled source files; seed counts must not be reported as newly downloaded Addgene records.
+
+Use `auraconstruct doctor --verify-databases` once per run to record file counts, bytes checked, manifest fingerprint and content-integrity status. Reuse that result in the report; do not repeat a full read for every annotation. Keep the quick readiness result distinct from full checksum verification. Continue real sequence-only regression tests separately from mocked unit tests.

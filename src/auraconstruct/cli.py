@@ -17,6 +17,8 @@ def main():
     serve=sub.add_parser("serve",help="Launch the local browser app")
     serve.add_argument("--port",type=int,default=8741)
     serve.add_argument("--no-browser",action="store_true")
+    doctor=sub.add_parser('doctor',help='Check local pLannotate tools and databases')
+    doctor.add_argument('--verify-databases',action='store_true',help='Read and SHA-256 verify every database file')
     export=sub.add_parser("export",help="Export one or more sequence files")
     export.add_argument("inputs",nargs="+",type=Path)
     export.add_argument("-o","--output",type=Path,required=True)
@@ -36,6 +38,12 @@ def main():
     ingest.add_argument('--access-note',default='');ingest.add_argument('--db',type=Path)
     ref=libsub.add_parser('export');ref.add_argument('-o','--output',required=True,type=Path);ref.add_argument('--db',type=Path)
     args=parser.parse_args()
+    if args.command=='doctor':
+        from .engine import status
+        result=status(verify_databases=args.verify_databases)
+        print(json.dumps(result,indent=2))
+        if not result['ready']:parser.exit(1)
+        return
     if args.command=='library':
         from . import library
         if args.library_command=='stats':result=library.stats(args.db)

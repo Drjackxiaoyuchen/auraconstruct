@@ -72,6 +72,8 @@ Single-line maps use compact labels and retain complete callouts in the review t
 ## Command line
 
 ```bash
+auraconstruct doctor
+auraconstruct doctor --verify-databases
 auraconstruct export plasmid.gb -o figure.pptx
 auraconstruct export plasmid.gb -o one-line.pptx --layout singleline
 auraconstruct export plasmid.gb -o full-callouts.pptx --layout schematic --detail detailed
@@ -81,6 +83,8 @@ auraconstruct export construct.fa -o figure.pptx --annotate plannotate --topolog
 auraconstruct export *.gb -o all-constructs.pptx --coordinates
 auraconstruct export annotated.gb -o coordinates.pptx --layout proportional
 ```
+
+`doctor` prints local pLannotate readiness as JSON and exits with status 1 when it is unavailable. `--verify-databases` additionally reads every database file and checks its SHA-256 against the bundle manifest. Normal readiness checks report `database_integrity: "unchecked"`; they check configuration and file availability without hashing the entire bundle.
 
 For multiple SVG pages, the CLI writes numbered SVG files. The browser app downloads a ZIP. **Single line** is the CLI, API and studio default: its backbone and CDS spans follow sequence coordinates, small symbols have minimum readable sizes, labels occupy tiers above the line, and explicit module spans appear below it. Its axis uses sequence-boundary positions from 0 to sequence length. Feature intervals in notes/table remain 1-based inclusive. **Wrapped** schematic order follows sequence coordinates with lengths not to scale. Coordinate mode puts exact colored interval tracks on a shared bp axis, using lanes to separate overlapping features on the same DNA molecule.
 
