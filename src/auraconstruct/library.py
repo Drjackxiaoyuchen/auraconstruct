@@ -26,6 +26,24 @@ def _hash(value):
     return hashlib.sha256(value.encode() if isinstance(value,str) else value).hexdigest()
 
 
+def _evidence(kind,qualifiers,source='imported'):
+    sources={source,*qualifiers.get('auraconstruct_source',[])}
+    if 'pLannotate-prediction' in sources or any(qualifiers.get(k) for k in ('ac_engine_version','ac_db_fingerprint')):
+        return 'predicted'
+    if any(s.startswith('exact-reference:') for s in sources) or qualifiers.get('library_part_sha256'):
+        return 'reference-match'
+    if sources & {'manual','user'}:return 'manual'
+    if sources-{'imported'}:return 'unreviewed'
+    if kind in {'old_sequence','misc_difference','variation','unsure'}:return 'historical-annotation'
+    return 'source-annotation'
+
+
+def _eligible(observation):
+    # Recheck legacy rows too: earlier imports labeled every observation as source evidence.
+    return (observation['evidence']=='source-annotation' and
+            _evidence(observation['type'],json.loads(observation['qualifiers']))=='source-annotation')
+
+
 def _connect(path):
     path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
     db=sqlite3.connect(path,timeout=20)
@@ -59,9 +77,11 @@ def stats(path=None):
     path=Path(path or library_path())
     if not path.exists():return dict(sources=0,records=0,parts=0,observations=0,matchable_parts=0)
     with sqlite3.connect(f'{path.resolve().as_uri()}?mode=ro',uri=True) as db:
+        db.row_factory=sqlite3.Row
         counts={table:db.execute(f'SELECT count(*) FROM {table}').fetchone()[0]
                 for table in ('sources','records','parts','observations')}
-        counts['matchable_parts']=db.execute("SELECT count(*) FROM parts p WHERE length>=12 AND sequence NOT GLOB '*[^ACGT]*' AND EXISTS (SELECT 1 FROM observations o WHERE o.part_id=p.id AND o.fuzzy=0)").fetchone()[0]
+        candidates=db.execute("SELECT o.* FROM observations o JOIN parts p ON o.part_id=p.id WHERE p.length>=12 AND p.sequence NOT GLOB '*[^ACGT]*' AND o.fuzzy=0")
+        counts['matchable_parts']=len({o['part_id'] for o in candidates if _eligible(o)})
     return counts
 
 
@@ -95,7 +115,7 @@ def ingest(data,file_name,*,source_url,license_notice,access_note='',path=None):
                     db.execute('INSERT OR IGNORE INTO observations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
                                (observation_id,record_id,part_id,f.id,f.label,f.type,f.role,f.role_source,
                                 json.dumps(f.segments),f.strand,1 if canonical==seq else -1,
-                                json.dumps(f.qualifiers,ensure_ascii=False),int(f.fuzzy),'source-annotation'))
+                                json.dumps(f.qualifiers,ensure_ascii=False),int(f.fuzzy),_evidence(f.type,f.qualifiers,f.source)))
     finally:db.close()
     after=stats(path)
     return dict(source_sha256=source_id,added={k:after[k]-before[k] for k in after},total=after)
@@ -121,10 +141,13 @@ def reference_genbank(path=None):
     with sqlite3.connect(f'{path.resolve().as_uri()}?mode=ro',uri=True) as db:
         db.row_factory=sqlite3.Row
         for part in db.execute("SELECT * FROM parts WHERE length>=12 AND sequence NOT GLOB '*[^ACGT]*' ORDER BY id"):
-            obs=db.execute('SELECT * FROM observations WHERE part_id=? AND fuzzy=0 ORDER BY id',(part['id'],)).fetchall()
+            obs=[o for o in db.execute('''SELECT o.*,r.source_id FROM observations o JOIN records r ON o.record_id=r.id
+                                          WHERE o.part_id=? AND o.fuzzy=0 ORDER BY o.id''',(part['id'],)) if _eligible(o)]
             if not obs:continue
-            contexts=db.execute('''SELECT DISTINCT c.url,c.license FROM contexts c JOIN records r ON c.source_id=r.source_id
+            source_ids={o['source_id'] for o in obs}
+            contexts=db.execute('''SELECT DISTINCT c.source_id,c.url,c.license FROM contexts c JOIN records r ON c.source_id=r.source_id
                                   JOIN observations o ON o.record_id=r.id WHERE o.part_id=?''',(part['id'],)).fetchall()
+            contexts=[c for c in contexts if c['source_id'] in source_ids]
             orientations=sorted({o['canonical_orientation'] for o in obs})
             for orientation in orientations:
                 group=[o for o in obs if o['canonical_orientation']==orientation]
@@ -133,6 +156,7 @@ def reference_genbank(path=None):
                 role=next(iter(roles)) if len(roles)==1 else 'generic'
                 kind=next(iter(types)) if len(types)==1 else 'misc_feature'
                 q={'library_part_sha256':[part['id']],'library_aliases':labels,
+                   'library_evidence':['source-annotation'],
                    'library_source_urls':sorted({c['url'] for c in contexts}),
                    'library_licenses':sorted({c['license'] for c in contexts}),
                    'library_role_issue':['true' if len(roles)>1 else 'false'],
@@ -142,7 +166,7 @@ def reference_genbank(path=None):
                 name=part['id'][:18]+('p' if orientation==1 else 'm')
                 c=Construct(name,name,part['sequence'],'linear',[f],'local-library','genbank')
                 output.append(to_genbank(c));observation_ids.extend(o['id'] for o in group)
-    if not output:raise ValueError('The library has no unambiguous, non-fuzzy reference parts of at least 12 bases.')
+    if not output:raise ValueError('The library has no eligible source-annotated, unambiguous, non-fuzzy reference parts of at least 12 bases.')
     return b''.join(output),_hash('\n'.join(sorted(observation_ids)))
 
 

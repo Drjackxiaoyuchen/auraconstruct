@@ -24,3 +24,5 @@ Record UTC retrieval times and local report dates, source URL/DOI, raw/sequence 
 The initial seed uses already bundled source files; seed counts must not be reported as newly downloaded Addgene records.
 
 Use `auraconstruct doctor --verify-databases` once per run to record file counts, bytes checked, manifest fingerprint and content-integrity status. Reuse that result in the report; do not repeat a full read for every annotation. Keep the quick readiness result distinct from full checksum verification. Continue real sequence-only regression tests separately from mocked unit tests.
+
+If a cloud-synced checkout cannot read Git metadata or returns filesystem errors, continue in an isolated checkout outside the synced folder. Preserve the original folder and any uncommitted user work; do not reset it or replace its Git metadata. Record which checkout was tested/published and whether the original folder still needs synchronization. Avoid repeating long blocked reads on subsequent runs.
