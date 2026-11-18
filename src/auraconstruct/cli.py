@@ -19,6 +19,12 @@ def main():
     serve.add_argument("--no-browser",action="store_true")
     doctor=sub.add_parser('doctor',help='Check local pLannotate tools and databases')
     doctor.add_argument('--verify-databases',action='store_true',help='Read and SHA-256 verify every database file')
+    validation=sub.add_parser('validate-annotation',help='Withhold source features, run pLannotate and report coordinate agreement')
+    validation.add_argument('input',type=Path)
+    validation.add_argument('-o','--output',type=Path,required=True,help='New private output directory; existing directories are not overwritten')
+    validation.add_argument('--topology',choices=['linear','circular'])
+    validation.add_argument('--feature-type',default='CDS')
+    validation.add_argument('--minimum-overlap',type=float,default=.9)
     export=sub.add_parser("export",help="Export one or more sequence files")
     export.add_argument("inputs",nargs="+",type=Path)
     export.add_argument("-o","--output",type=Path,required=True)
@@ -38,6 +44,16 @@ def main():
     ingest.add_argument('--access-note',default='');ingest.add_argument('--db',type=Path)
     ref=libsub.add_parser('export');ref.add_argument('-o','--output',required=True,type=Path);ref.add_argument('--db',type=Path)
     args=parser.parse_args()
+    if args.command=='validate-annotation':
+        from .validation import validate_annotation
+        try:
+            report=validate_annotation(args.input,args.output,topology=args.topology,
+                                       feature_type=args.feature_type,minimum_overlap=args.minimum_overlap)
+        except (OSError,ValueError) as exc:parser.exit(2,f'Error: {exc}\n')
+        print(json.dumps({'status':report['status'],'report':str(args.output/'report.json'),
+                          'predictions':report['predictions'],'assessment_available':report['comparison']['assessment_available'],
+                          'assessment_note':report['comparison']['assessment_note'],'comparison':report['comparison']['summary']},indent=2))
+        return
     if args.command=='doctor':
         from .engine import status
         result=status(verify_databases=args.verify_databases)

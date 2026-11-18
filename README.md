@@ -74,6 +74,7 @@ Single-line maps use compact labels and retain complete callouts in the review t
 ```bash
 auraconstruct doctor
 auraconstruct doctor --verify-databases
+auraconstruct validate-annotation deposited.gb -o /private/path/validation-run --topology circular
 auraconstruct export plasmid.gb -o figure.pptx
 auraconstruct export plasmid.gb -o one-line.pptx --layout singleline
 auraconstruct export plasmid.gb -o full-callouts.pptx --layout schematic --detail detailed
@@ -85,6 +86,8 @@ auraconstruct export annotated.gb -o coordinates.pptx --layout proportional
 ```
 
 `doctor` prints local pLannotate readiness as JSON and exits with status 1 when it is unavailable. `--verify-databases` additionally reads every database file and checks its SHA-256 against the bundle manifest. Normal readiness checks report `database_integrity: "unchecked"`; they check configuration and file availability without hashing the entire bundle.
+
+`validate-annotation` runs the local engine with all original features withheld and saves a coordinate-agreement report, raw input, feature-free FASTA, predictions and editable single-line figures. Its default comparison covers CDS features at 90% reciprocal interval overlap, with explicit unmatched and ambiguous annotations. These are coordinate comparisons, not annotation-accuracy or functional-validation scores. Use a new private output directory: artifacts contain DNA and existing directories are never overwritten. [Validation details](docs/ANNOTATION.md#repeatable-annotation-withheld-validation).
 
 For multiple SVG pages, the CLI writes numbered SVG files. The browser app downloads a ZIP. **Single line** is the CLI, API and studio default: its backbone and CDS spans follow sequence coordinates, small symbols have minimum readable sizes, labels occupy tiers above the line, and explicit module spans appear below it. Its axis uses sequence-boundary positions from 0 to sequence length. Feature intervals in notes/table remain 1-based inclusive. **Wrapped** schematic order follows sequence coordinates with lengths not to scale. Coordinate mode puts exact colored interval tracks on a shared bp axis, using lanes to separate overlapping features on the same DNA molecule.
 

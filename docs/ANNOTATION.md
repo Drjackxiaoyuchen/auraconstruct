@@ -46,6 +46,20 @@ The actual engine and full default database search were run locally, with origin
 
 Every output retained the exact input DNA and exported as one editable PowerPoint slide. These counts describe predictions, not annotation accuracy or complete recovery of deposited features. The database bundle manifest is v2, built 2026-07-05; its sources have their own dates and versions. Missed features, fragments and conflicting labels need review. Runtime measurements and raw outputs stay in the local validation directory rather than the public repository.
 
+## Repeatable annotation-withheld validation
+
+```bash
+auraconstruct validate-annotation deposited.gb -o /private/path/validation-run --topology circular
+```
+
+This local command requires exactly one input record and runs pLannotate on its DNA with zero input features and no imported annotation provenance. It retains the raw source, feature-free query FASTA, predicted GenBank/project JSON, Aureka single-line SVG/native PPTX, artifact checksums, engine/database identifiers and UTC timestamps. A failed run records its error instead of a completed result. Use a new output directory each time; these artifacts contain DNA and should remain private.
+
+After annotation, `report.json` compares the original and predicted features of one GenBank type (`--feature-type CDS` by default). Candidates require the same known strand and at least 90% coverage of **both** interval unions (`--minimum-overlap 0.9`). Joined/circular-origin intervals retain their original ordered segments; union coverage prevents counting overlapping segments twice. Names are not matching criteria. Exact interval coverage does not establish identical coding interpretation or function. No rotation or realignment is performed, and DNA or topology changes reject the comparison.
+
+The report keeps reference and prediction denominators separate, lists unmatched features, and exposes multiple candidates. An unambiguous pair requires exactly one candidate in each direction; duplicate annotations are not silently assigned to a preferred match. Fuzzy boundaries and unknown/mixed strands remain listed but are excluded from agreement counts. Zero eligible source features means no agreement assessment is available. Deposited annotations may be incomplete or wrong, so unmatched predictions are not established false positives and the output is not a measured accuracy, precision or recall score.
+
+The report also records source/prediction feature-type counts. Some deposited files encode every feature as `misc_feature`; those have zero CDS reference features even when the illustration assigns CDS glyphs from labels. The report explicitly marks a CDS assessment unavailable in that case. Illustration heuristics do not rewrite the deposited feature types for evaluation.
+
 ## Private library foundation
 
 `auraconstruct library seed-demos` ingests the six already bundled source files into the local SQLite library; it is not a new Addgene download. `library stats`, `library ingest ... --source-url ... --license ...`, and `library export -o references.gb` support provenance-preserving reference management. Raw files, the database, aliases and source observations stay under the local data directory. The library currently provides exact reference matching, distinct from pLannotate's similarity search; broader acquisition is queued while pLannotate is prioritized.
