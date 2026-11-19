@@ -13,6 +13,8 @@ from Bio.Seq import Seq
 from .model import Construct, Feature
 from .sequence_io import read_bytes, to_genbank
 
+REFERENCE_POLICY='source-annotation-v1'
+
 
 def data_dir():
     return Path(os.environ.get('AURACONSTRUCT_DATA_DIR',Path.home()/'.local/share/auraconstruct')).expanduser()
@@ -137,7 +139,7 @@ def seed_demos(path=None):
 def reference_genbank(path=None):
     path=Path(path or library_path())
     if not path.exists():raise ValueError('The local library is empty. Ingest annotated reference records first.')
-    output=[];observation_ids=[]
+    output=[]
     with sqlite3.connect(f'{path.resolve().as_uri()}?mode=ro',uri=True) as db:
         db.row_factory=sqlite3.Row
         for part in db.execute("SELECT * FROM parts WHERE length>=12 AND sequence NOT GLOB '*[^ACGT]*' ORDER BY id"):
@@ -157,6 +159,7 @@ def reference_genbank(path=None):
                 kind=next(iter(types)) if len(types)==1 else 'misc_feature'
                 q={'library_part_sha256':[part['id']],'library_aliases':labels,
                    'library_evidence':['source-annotation'],
+                   'library_ref_policy':[REFERENCE_POLICY],
                    'library_source_urls':sorted({c['url'] for c in contexts}),
                    'library_licenses':sorted({c['license'] for c in contexts}),
                    'library_role_issue':['true' if len(roles)>1 else 'false'],
@@ -165,14 +168,16 @@ def reference_genbank(path=None):
                 f=Feature('part',label,kind,role,[[0,part['length']]],orientation,role_source='library-source-consensus',qualifiers=q)
                 name=part['id'][:18]+('p' if orientation==1 else 'm')
                 c=Construct(name,name,part['sequence'],'linear',[f],'local-library','genbank')
-                output.append(to_genbank(c));observation_ids.extend(o['id'] for o in group)
+                output.append(to_genbank(c))
     if not output:raise ValueError('The library has no eligible source-annotated, unambiguous, non-fuzzy reference parts of at least 12 bases.')
-    return b''.join(output),_hash('\n'.join(sorted(observation_ids)))
+    raw=b''.join(output)
+    # Exported source URLs/terms can change without adding any observation IDs.
+    return raw,_hash(b'auraconstruct-reference-v2\n'+raw)
 
 
 def annotate_library(construct,path=None):
     from .annotate import exact_annotate
     raw,revision=reference_genbank(path)
     result=exact_annotate(construct,raw,f'local-library-{revision[:12]}.gb')
-    result.provenance={**result.provenance,'local_library_revision':revision}
+    result.provenance={**result.provenance,'local_library_revision':revision,'local_library_policy':REFERENCE_POLICY}
     return result

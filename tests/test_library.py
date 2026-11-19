@@ -32,6 +32,7 @@ def test_dedup_keeps_aliases_and_source_observations(tmp_path):
 
 
 def test_library_match_retains_strand_coordinates_and_sequence(tmp_path):
+    from auraconstruct.library import REFERENCE_POLICY
     db=tmp_path/'library.db';c=fixture()
     ingest(to_genbank(c),'ref.gb',source_url='https://example.org/a',license_notice='test fixture',path=db)
     for strand,seq in [(1,c.sequence),(-1,str(Seq(c.sequence).reverse_complement()))]:
@@ -42,6 +43,8 @@ def test_library_match_retains_strand_coordinates_and_sequence(tmp_path):
         assert f.segments==[[4,24]] and f.strand==strand and f.role=='cds'
         assert f.source.startswith('exact-reference:local-library-')
         assert 'https://example.org/a' in f.qualifiers['library_source_urls']
+        assert result.provenance['local_library_revision']==reference_genbank(db)[1]
+        assert result.provenance['local_library_policy']==REFERENCE_POLICY
 
 
 def test_seed_is_idempotent_and_keeps_raw_feature_counts(tmp_path):
@@ -116,3 +119,36 @@ def test_reimporting_a_library_export_does_not_create_independent_source_evidenc
     assert stats(second)['observations']==1 and stats(second)['matchable_parts']==0
     with sqlite3.connect(second) as con:
         assert con.execute('SELECT evidence FROM observations').fetchone()[0]=='reference-match'
+
+
+@pytest.mark.parametrize('change',['url','license'])
+def test_export_revision_changes_when_source_context_changes_without_new_observations(tmp_path,change):
+    db=tmp_path/'library.db';raw=to_genbank(fixture())
+    ingest(raw,'source.gb',source_url='https://example.org/original',license_notice='original terms',path=db)
+    before,revision=reference_genbank(db)
+    result=ingest(raw,'source.gb',source_url='https://example.org/second' if change=='url' else 'https://example.org/original',
+                  license_notice='revised terms' if change=='license' else 'original terms',path=db)
+    after,changed_revision=reference_genbank(db)
+    assert result['added']['observations']==result['added']['records']==0
+    assert before!=after and revision!=changed_revision
+    assert reference_genbank(db)==(after,changed_revision)
+
+
+def test_reference_policy_is_visible_and_versioned_without_rewriting_observations(tmp_path,monkeypatch):
+    from auraconstruct import library
+    db=tmp_path/'library.db';raw=to_genbank(fixture())
+    ingest(raw,'source.gb',source_url='https://example.org/source',license_notice='test',path=db)
+    before,revision=reference_genbank(db);counts=stats(db)
+    assert read_bytes(before,'reference.gb')[0].features[0].qualifiers['library_ref_policy']==[library.REFERENCE_POLICY]
+    monkeypatch.setattr(library,'REFERENCE_POLICY','test-policy-v2')
+    after,changed_revision=reference_genbank(db)
+    assert before!=after and revision!=changed_revision and stats(db)==counts
+
+
+def test_context_notes_not_exported_do_not_change_the_export_revision(tmp_path):
+    db=tmp_path/'library.db';raw=to_genbank(fixture())
+    ingest(raw,'source.gb',source_url='https://example.org/source',license_notice='test',path=db)
+    before=reference_genbank(db)
+    ingest(raw,'source.gb',source_url='https://example.org/source',license_notice='test',access_note='Additional private retrieval note',path=db)
+    assert reference_genbank(db)==before
+    with sqlite3.connect(db) as con:assert con.execute('SELECT count(*) FROM contexts').fetchone()[0]==2
