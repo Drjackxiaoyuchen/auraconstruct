@@ -68,6 +68,21 @@ Ingestion retains predictions, reference matches, manual/unknown-tool annotation
 
 Reference export revisions in v0.6.4 hash the exact exported GenBank bytes with the version prefix `auraconstruct-reference-v2` followed by a newline. The export records its eligibility-policy identifier, also retained in matched-project provenance. Changes to exported aliases, roles, source URLs or license notices therefore change the revision even when no new observations are added. Identical export content remains stable; excluded prediction-only sources do not affect it. This replaces the earlier observation-ID-only hash, so existing libraries receive a new revision without changing their DNA or deleting observations. It identifies the exported reference snapshot, not every field in SQLite: private retrieval notes and timestamps remain stored separately and are not included unless exported.
 
+## Private custom search index
+
+```bash
+auraconstruct library build-index -o ~/.local/share/auraconstruct/indexes/source-v1
+auraconstruct library index-status ~/.local/share/auraconstruct/indexes/source-v1
+```
+
+`build-index` reads the eligible source-reference export, converts each reference to its biological strand, and invokes the isolated engine's `plannotate makedb` with nucleotide FASTA/description CSV, BLAST and `--no-builtins`. It requires pLannotate and `makeblastdb`. The 180-second build timeout is configurable with `--timeout`; failed builds retain a failed manifest and diagnostics. Existing output directories are never overwritten.
+
+Role or strand conflicts are omitted from the search index and listed in the manifest, while their raw observations remain in SQLite and the retained reference GenBank. Indexed entries keep aliases, source URLs, license notices, part hashes and the reference revision/policy. Input and compiled-index hashes form a versioned bundle fingerprint. Everything in this directory contains private reference data and should stay outside public GitHub.
+
+`index-status` checks every manifest-listed file and the manifest fingerprint; it reports integrity readiness, not biological accuracy, search coverage, or agreement with the newest library revision. Later acquisitions require a build in a new directory. The saved `databases.yml` can be passed with `-y` to a separate, isolated pLannotate batch run. Its output remains similarity predictions and must not be ingested as independent source evidence. The studio's **Run pLannotate** button continues using the default builtin bundle.
+
+This standalone index is intended for evaluation. Deposited labels can be incomplete or contextual, and the conflict filter can omit useful markers. It is not a replacement for the builtin database. Compare source/prediction denominators and review missing/fragment calls before using a custom configuration for presentation annotation. Custom search was tested separately from the default engine; index verification alone does not establish a successful query.
+
 ## Interpretation
 
 Imported annotations may themselves be wrong. Exact matches and pLannotate calls produce sequence-based assignments. User edits are manual decisions. None is an experimentally validated function, expression result, or binding measurement merely because a figure displays it.

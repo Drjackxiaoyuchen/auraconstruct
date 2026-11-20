@@ -43,6 +43,11 @@ def main():
     ingest.add_argument('--source-url',required=True);ingest.add_argument('--license',required=True,dest='license_notice')
     ingest.add_argument('--access-note',default='');ingest.add_argument('--db',type=Path)
     ref=libsub.add_parser('export');ref.add_argument('-o','--output',required=True,type=Path);ref.add_argument('--db',type=Path)
+    index=libsub.add_parser('build-index',help='Build a private standalone pLannotate BLAST database')
+    index.add_argument('-o','--output',required=True,type=Path);index.add_argument('--db',type=Path)
+    index.add_argument('--timeout',type=int,default=180)
+    check_index=libsub.add_parser('index-status',help='Verify private index files and provenance')
+    check_index.add_argument('directory',type=Path)
     args=parser.parse_args()
     if args.command=='validate-annotation':
         from .validation import validate_annotation
@@ -62,6 +67,15 @@ def main():
         return
     if args.command=='library':
         from . import library
+        if args.library_command in ('build-index','index-status'):
+            from .library_index import build_index,index_status
+            try:
+                result=(build_index(args.output,args.db,args.timeout) if args.library_command=='build-index'
+                        else index_status(args.directory))
+            except (OSError,ValueError) as exc:parser.exit(2,f'Error: {exc}\n')
+            print(json.dumps(result,indent=2))
+            if not result['ready']:parser.exit(1)
+            return
         if args.library_command=='stats':result=library.stats(args.db)
         elif args.library_command=='seed-demos':result=library.seed_demos(args.db)
         elif args.library_command=='export':
