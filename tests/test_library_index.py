@@ -5,7 +5,7 @@ import subprocess
 
 import pytest
 
-from auraconstruct import library_index
+from auraconstruct import library_index,library
 from auraconstruct.library import ingest,stats
 from auraconstruct.model import Construct,Feature
 from auraconstruct.sequence_io import to_genbank,read_bytes
@@ -44,7 +44,7 @@ def test_private_builder_retains_biological_orientation_source_policy_and_snapsh
     assert result['ready'] and result['entries']==1 and result['skipped']==0 and stats(db)==before
     m=json.loads((out/'manifest.json').read_text())
     assert m['entries'][0]['source_urls']==['https://example.org/source']
-    assert m['entries'][0]['licenses']==['test terms'] and m['reference_policy']=='source-annotation-v1'
+    assert m['entries'][0]['licenses']==['test terms'] and m['reference_policy']==library.REFERENCE_POLICY
     assert read_bytes((out/'parts.fasta').read_bytes(),'parts.fasta')[0].sequence==source().sequence
     assert len(m['index_fingerprint'])==len(m['reference_revision'])==64
     assert library_index.index_status(out)['ready']
@@ -88,3 +88,14 @@ def test_index_status_cli_emits_nonzero_json_result_for_missing_bundle(tmp_path,
     monkeypatch.setattr('sys.argv',['auraconstruct','library','index-status',str(tmp_path/'missing')])
     with pytest.raises(SystemExit) as exc:main()
     assert exc.value.code==1 and json.loads(capsys.readouterr().out)['ready'] is False
+
+
+def test_index_keeps_resolved_context_alternatives_and_explicit_cds_type(tmp_path,monkeypatch):
+    db=seeded(tmp_path);c=source();c.name='context';f=c.features[0]
+    f.label='Gene context';f.type='gene';f.role='generic'
+    ingest(to_genbank(c),'context.gb',source_url='https://example.org/context',license_notice='test terms',path=db)
+    fake_builder(monkeypatch);out=tmp_path/'index';result=library_index.build_index(out,db)
+    m=json.loads((out/'manifest.json').read_text());entry=m['entries'][0]
+    assert result['entries']==1 and result['skipped']==0 and entry['type']=='CDS' and entry['role']=='cds'
+    assert entry['role_resolution']=='source-semantics' and entry['role_alternatives']==['cds','generic']
+    assert entry['type_alternatives']==['CDS','gene'] and stats(db)['observations']==2

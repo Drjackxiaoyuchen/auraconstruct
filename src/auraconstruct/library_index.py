@@ -14,7 +14,7 @@ from Bio.Seq import Seq
 from . import engine,library
 from .sequence_io import read_bytes
 
-SELECTION_POLICY='eligible-source-without-role-or-strand-conflicts-v1'
+SELECTION_POLICY='eligible-source-semantics-without-unresolved-conflicts-v2'
 
 
 def _sha(path):
@@ -57,8 +57,12 @@ def build_index(directory,path=None,timeout=180):
         f=c.features[0];q=f.qualifiers
         entry={'id':f'part_{i:06d}','part_sha256':q['library_part_sha256'][0],
                'name':f.label,'type':f.type,'role':f.role,'source_orientation':f.strand,
-               'aliases':q['library_aliases'],'source_urls':q['library_source_urls'],'licenses':q['library_licenses']}
-        issues=[k for k in ('library_role_issue','library_strand_issue') if q.get(k)==['true']]
+               'aliases':q['library_aliases'],'source_urls':q['library_source_urls'],'licenses':q['library_licenses'],
+               'role_resolution':q.get('library_role_choice',['legacy-consensus'])[0],
+               'role_alternatives':q.get('library_role_alts',[f.role]),'type_alternatives':q.get('library_type_alts',[f.type])}
+        issues=[]
+        if q.get('library_strand_issue')==['true']:issues.append('library_strand_issue')
+        if q.get('library_role_issue')==['true'] and entry['role_resolution']!='source-semantics':issues.append('library_role_issue')
         if issues:
             skipped.append({**entry,'reasons':issues});continue
         sequence=c.sequence if f.strand==1 else str(Seq(c.sequence).reverse_complement())

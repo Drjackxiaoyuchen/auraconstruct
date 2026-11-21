@@ -10,10 +10,10 @@ import sqlite3
 
 from Bio.Seq import Seq
 
-from .model import Construct, Feature
+from .model import Construct, Feature, infer_role
 from .sequence_io import read_bytes, to_genbank
 
-REFERENCE_POLICY='source-annotation-v1'
+REFERENCE_POLICY='source-semantics-v2'
 
 
 def data_dir():
@@ -44,6 +44,25 @@ def _eligible(observation):
     # Recheck legacy rows too: earlier imports labeled every observation as source evidence.
     return (observation['evidence']=='source-annotation' and
             _evidence(observation['type'],json.loads(observation['qualifiers']))=='source-annotation')
+
+
+def _consensus(group):
+    """Prefer explicit feature semantics over context, retaining functional conflicts."""
+    roles={o['role'] for o in group};types={o['type'] for o in group};typed=[];inconsistent=False
+    for o in group:
+        role,reason=infer_role(o['type'],json.loads(o['qualifiers']),o['label'])
+        if reason in ('feature-type','regulatory-class','sequence-ontology') and role!='generic':
+            typed.append((role,o['type']))
+            if role!=o['role']:inconsistent=True
+    explicit_roles={role for role,kind in typed}
+    if inconsistent or len(explicit_roles)>1:return 'generic','misc_feature','unresolved'
+    if len(explicit_roles)==1:
+        role=next(iter(explicit_roles));explicit_types={kind for r,kind in typed}
+        # A different functional role remains a conflict, even if inferred from a label.
+        if roles <= {role,'generic','region'}:
+            return role,next(iter(explicit_types)) if len(explicit_types)==1 else 'misc_feature','source-semantics'
+    if len(roles)==1:return next(iter(roles)),next(iter(types)) if len(types)==1 else 'misc_feature','consensus'
+    return 'generic','misc_feature','unresolved'
 
 
 def _connect(path):
@@ -155,17 +174,17 @@ def reference_genbank(path=None):
                 group=[o for o in obs if o['canonical_orientation']==orientation]
                 labels=sorted({o['label'] for o in group});roles={o['role'] for o in group};types={o['type'] for o in group}
                 label=' / '.join(labels);label=label if len(label)<=240 else label[:237]+'...'
-                role=next(iter(roles)) if len(roles)==1 else 'generic'
-                kind=next(iter(types)) if len(types)==1 else 'misc_feature'
+                role,kind,choice=_consensus(group)
                 q={'library_part_sha256':[part['id']],'library_aliases':labels,
                    'library_evidence':['source-annotation'],
                    'library_ref_policy':[REFERENCE_POLICY],
                    'library_source_urls':sorted({c['url'] for c in contexts}),
                    'library_licenses':sorted({c['license'] for c in contexts}),
-                   'library_role_issue':['true' if len(roles)>1 else 'false'],
+                   'library_role_issue':['true' if len(roles)>1 or choice=='unresolved' else 'false'],
+                   'library_role_choice':[choice],'library_role_alts':sorted(roles),'library_type_alts':sorted(types),
                    'library_strand_issue':['true' if len(orientations)>1 else 'false'],
                    'note':['Source feature annotation; identity/function has not been independently validated.']}
-                f=Feature('part',label,kind,role,[[0,part['length']]],orientation,role_source='library-source-consensus',qualifiers=q)
+                f=Feature('part',label,kind,role,[[0,part['length']]],orientation,role_source='library-'+choice,qualifiers=q)
                 name=part['id'][:18]+('p' if orientation==1 else 'm')
                 c=Construct(name,name,part['sequence'],'linear',[f],'local-library','genbank')
                 output.append(to_genbank(c))

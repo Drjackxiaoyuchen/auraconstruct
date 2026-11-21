@@ -152,3 +152,34 @@ def test_context_notes_not_exported_do_not_change_the_export_revision(tmp_path):
     ingest(raw,'source.gb',source_url='https://example.org/source',license_notice='test',access_note='Additional private retrieval note',path=db)
     assert reference_genbank(db)==before
     with sqlite3.connect(db) as con:assert con.execute('SELECT count(*) FROM contexts').fetchone()[0]==2
+
+
+@pytest.mark.parametrize('context_kind,context_role',[('gene','generic'),('misc_feature','region')])
+def test_explicit_cds_survives_context_annotations_without_erasing_alternatives(tmp_path,context_kind,context_role):
+    db=tmp_path/'library.db';c=fixture()
+    ingest(to_genbank(c),'coding.gb',source_url='https://example.org/coding',license_notice='test',path=db)
+    # Repetition is not independent evidence and must not outvote a typed CDS.
+    for i in range(3):
+        c.name=f'context{i}';f=c.features[0];f.type=context_kind;f.role=context_role;f.label='Context region'
+        ingest(to_genbank(c),'context.gb',source_url=f'https://example.org/context/{i}',license_notice='test',path=db)
+    raw,_=reference_genbank(db);f=read_bytes(raw,'references.gb')[0].features[0]
+    assert f.type=='CDS' and f.role=='cds' and f.qualifiers['library_role_choice']==['source-semantics']
+    assert f.qualifiers['library_role_issue']==['true'] and f.qualifiers['library_role_alts']==sorted(['cds',context_role])
+    assert stats(db)['observations']==4 and stats(db)['parts']==1
+
+
+def test_functional_label_conflict_is_not_overridden_by_typed_cds(tmp_path):
+    db=tmp_path/'library.db';c=fixture()
+    ingest(to_genbank(c),'coding.gb',source_url='https://example.org/coding',license_notice='test',path=db)
+    c.name='other';c.features[0].type='misc_feature';c.features[0].role='promoter';c.features[0].label='Promoter'
+    ingest(to_genbank(c),'other.gb',source_url='https://example.org/other',license_notice='test',path=db)
+    raw,_=reference_genbank(db);f=read_bytes(raw,'reference.gb')[0].features[0]
+    assert f.role=='generic' and f.qualifiers['library_role_choice']==['unresolved']
+    assert f.qualifiers['library_role_alts']==['cds','promoter']
+
+
+def test_saved_glyph_override_cannot_override_inconsistent_feature_type(tmp_path):
+    db=tmp_path/'library.db';c=fixture();c.features[0].role='promoter'
+    ingest(to_genbank(c),'edited.gb',source_url='https://example.org/source',license_notice='test',path=db)
+    raw,_=reference_genbank(db);f=read_bytes(raw,'reference.gb')[0].features[0]
+    assert f.type=='misc_feature' and f.role=='generic' and f.qualifiers['library_role_issue']==['true']
