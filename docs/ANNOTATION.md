@@ -75,11 +75,19 @@ From v0.7.1, policy `source-semantics-v2` resolves generic context using explici
 ```bash
 auraconstruct library build-index -o ~/.local/share/auraconstruct/indexes/source-v1
 auraconstruct library index-status ~/.local/share/auraconstruct/indexes/source-v1
+# Optional independent experiment; keep both snapshots for comparison:
+auraconstruct library build-index --profile parts -o ~/.local/share/auraconstruct/indexes/parts-v1
 ```
 
 `build-index` reads the eligible source-reference export, converts each reference to its biological strand, and invokes the isolated engine's `plannotate makedb` with nucleotide FASTA/description CSV, BLAST and `--no-builtins`. It requires pLannotate and `makeblastdb`. The 180-second build timeout is configurable with `--timeout`; failed builds retain a failed manifest and diagnostics. Existing output directories are never overwritten.
 
 Unresolved role conflicts and all strand conflicts are omitted from the search index and listed in the manifest, while their raw observations remain in SQLite and the retained reference GenBank. Context resolved by explicit source semantics can be included; entries keep the resolution method and alternative roles/types alongside aliases, source URLs, license notices, part hashes and the reference revision/policy. Input and compiled-index hashes form a versioned bundle fingerprint. Everything in this directory contains private reference data and should stay outside public GitHub. Existing index snapshots remain immutable and verifiable; adopting a new policy requires a build in a new directory.
+
+The default `--profile source` retains eligible context entries. Optional `--profile parts` omits roles `generic`, `region` and `engineered_region` before searching. This can reduce competition from broad contextual intervals over nested feature calls; it also removes potentially useful annotations. All exclusions remain in the manifest with their reasons and source metadata, and the full reference export remains byte-identical between profiles built from the same library snapshot. Other roles may still come from illustration label heuristics; this profile does not establish function, rewrite source types, or guarantee that pLannotate will report a particular hit. Both profiles exclude unresolved role/strand conflicts. Compare both runs and review omissions before adopting the smaller index.
+
+From v0.7.2, index manifest schema 2 records the profile in its integrity fingerprint. `index-status` still verifies schema 1 snapshots using their original hash contract and reports their full-source profile. Neither a new profile nor a successful integrity check activates a custom index in the studio.
+
+Single-line SVG/PPTX display labels retain an explicit trailing `(fragment)` qualifier when shortening long names. Full source labels remain in the project and slide notes; this display rule adds no biological interpretation.
 
 `index-status` checks every manifest-listed file and the manifest fingerprint; it reports integrity readiness, not biological accuracy, search coverage, or agreement with the newest library revision. Later acquisitions require a build in a new directory. The saved `databases.yml` can be passed with `-y` to a separate, isolated pLannotate batch run. Its output remains similarity predictions and must not be ingested as independent source evidence. The studio's **Run pLannotate** button continues using the default builtin bundle.
 

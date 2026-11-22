@@ -15,9 +15,14 @@ def _label_width(label, size):
 
 def _short_label(text,size,limit=204,chars=28):
     clean=' '.join(text.split())
-    shown=clean if len(clean)<=chars else clean[:chars-1]+'…'
-    while _label_width(shown,size)>limit:
-        shown=shown[:-2]+'…'
+    # Preserve an explicit partial-match qualification when the display name shrinks.
+    suffix=clean[-11:] if clean.lower().endswith(' (fragment)') else ''
+    prefix=clean[:-len(suffix)] if suffix else clean
+    shown=clean
+    if len(shown)>chars:
+        prefix=prefix[:max(0,chars-len(suffix)-1)].rstrip();shown=prefix+'…'+suffix
+    while _label_width(shown,size)>limit and prefix:
+        prefix=prefix[:-1].rstrip();shown=prefix+'…'+suffix
     return shown,_label_width(shown,size)
 
 

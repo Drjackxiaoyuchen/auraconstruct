@@ -139,6 +139,23 @@ def test_native_groups_editable_text_no_raster_and_notes():
                 assert target in z.namelist(), (name,target)
 
 
+def test_shortened_partial_match_labels_keep_fragment_qualification_in_svg_and_pptx():
+    label='A very long name for an origin of replication (fragment)'
+    c=Construct('fragment','fragment','ACGT'*100,'circular',[
+        Feature('f','A very long name for an origin of replication (fragment)','rep_origin','origin',[[20,90]],1)
+    ],'test.fa','fasta')
+    pages=build_pages(c,layout='singleline');svg=to_svg(pages[0])
+    displayed=[p for p in pages[0].items if p.kind=='text' and p.group=='f']
+    assert len(displayed)==1 and displayed[0].text.endswith(' (fragment)') and '…' in displayed[0].text
+    assert displayed[0].w<=204 and '(fragment)' in svg
+    assert c.features[0].label==label
+    with ZipFile(io.BytesIO(to_pptx(pages))) as z:
+        slide=ET.fromstring(z.read('ppt/slides/slide1.xml'))
+        assert displayed[0].text in [e.text for e in slide.findall(f'.//{{{A}}}t')]
+        notes=ET.fromstring(z.read('ppt/notesSlides/notesSlide1.xml'))
+        assert label in ' '.join(e.text or '' for e in notes.findall(f'.//{{{A}}}t'))
+
+
 def test_dense_maps_paginate_and_stay_on_canvas():
     c=sample()
     c.features=[Feature(str(i),"A longer annotation label for a feature",'CDS','cds',[[i*30,i*30+20]],-1 if i%2 else 1,module='Module label' if i%3 else '') for i in range(65)]

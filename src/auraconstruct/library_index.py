@@ -15,6 +15,8 @@ from . import engine,library
 from .sequence_io import read_bytes
 
 SELECTION_POLICY='eligible-source-semantics-without-unresolved-conflicts-v2'
+PROFILES={'source':SELECTION_POLICY,'parts':'eligible-parts-without-context-roles-or-unresolved-conflicts-v1'}
+CONTEXT_ROLES=frozenset(('generic','region','engineered_region'))
 
 
 def _sha(path):
@@ -27,6 +29,7 @@ def _sha(path):
 def _fingerprint(manifest):
     keys=('schema_version','reference_revision','reference_policy','selection_policy','engine_version',
           'method','config','entries','skipped','files')
+    if manifest['schema_version']==2:keys+=('profile',)
     return hashlib.sha256(json.dumps({k:manifest[k] for k in keys},sort_keys=True).encode()).hexdigest()
 
 
@@ -36,21 +39,25 @@ def index_status(directory):
     try:
         m=json.loads((root/'manifest.json').read_text())
         if not isinstance(m,dict):raise ValueError('Index manifest must be a JSON object.')
-        if m.get('schema_version')!=1 or m.get('status')!='ready':raise ValueError('Index build is not ready.')
+        if m.get('schema_version') not in (1,2) or m.get('status')!='ready':raise ValueError('Index build is not ready.')
+        profile='source' if m['schema_version']==1 else m.get('profile')
+        if m['schema_version']==2 and (profile not in PROFILES or m.get('selection_policy')!=PROFILES[profile]):
+            raise ValueError('Index profile and selection policy are inconsistent.')
         if m.get('config')!='databases.yml' or m['config'] not in m.get('files',{}):raise ValueError('Index configuration is missing.')
         for name,path,expected in engine._database_files(m,str(root)):
             if _sha(path)!=expected:raise ValueError('Index checksum mismatch: '+name)
             result['files_checked']+=1;result['bytes_checked']+=path.stat().st_size
         if _fingerprint(m)!=m.get('index_fingerprint'):raise ValueError('Index manifest fingerprint mismatch.')
         result.update(ready=True,index_fingerprint=m['index_fingerprint'],reference_revision=m['reference_revision'],
-                      entries=len(m['entries']),skipped=len(m['skipped']),config=str(root/m['config']),
+                      entries=len(m['entries']),skipped=len(m['skipped']),profile=profile,config=str(root/m['config']),
                       reason='Recorded index files and provenance passed verification; query behavior is checked separately.')
     except (OSError,ValueError,KeyError,TypeError) as exc:result['reason']=str(exc)
     return result
 
 
-def build_index(directory,path=None,timeout=180):
+def build_index(directory,path=None,timeout=180,*,profile='source'):
     if timeout<=0:raise ValueError('Index build timeout must be positive.')
+    if profile not in PROFILES:raise ValueError('Unknown index profile: '+str(profile))
     raw,revision=library.reference_genbank(path)
     records=read_bytes(raw,'references.gb');entries=[];skipped=[];sequences=[]
     for i,c in enumerate(records,1):
@@ -63,11 +70,12 @@ def build_index(directory,path=None,timeout=180):
         issues=[]
         if q.get('library_strand_issue')==['true']:issues.append('library_strand_issue')
         if q.get('library_role_issue')==['true'] and entry['role_resolution']!='source-semantics':issues.append('library_role_issue')
+        if profile=='parts' and f.role in CONTEXT_ROLES:issues.append('context_role_excluded_by_parts_profile')
         if issues:
             skipped.append({**entry,'reasons':issues});continue
         sequence=c.sequence if f.strand==1 else str(Seq(c.sequence).reverse_complement())
         sequences.append(sequence);entries.append(entry)
-    if not entries:raise ValueError('No conflict-free eligible source references are available for indexing.')
+    if not entries:raise ValueError('No conflict-free eligible source references remain for the selected index profile.')
     exe=engine.executable()
     if not exe:raise ValueError('pLannotate is not installed.')
     env=engine.environment(exe)
@@ -77,8 +85,8 @@ def build_index(directory,path=None,timeout=180):
     if version.returncode:raise ValueError('Cannot read pLannotate version: '+(version.stderr or version.stdout)[-500:])
     if not version.stdout.strip():raise ValueError('pLannotate did not report a version.')
     root=Path(directory).resolve();root.mkdir(parents=True,exist_ok=False)
-    m={'schema_version':1,'status':'building','created_utc':datetime.now(timezone.utc).isoformat(),
-       'reference_revision':revision,'reference_policy':library.REFERENCE_POLICY,'selection_policy':SELECTION_POLICY,
+    m={'schema_version':2,'status':'building','created_utc':datetime.now(timezone.utc).isoformat(),
+       'reference_revision':revision,'reference_policy':library.REFERENCE_POLICY,'selection_policy':PROFILES[profile],'profile':profile,
        'engine_version':version.stdout.splitlines()[0].strip(),'method':'blastn','config':'databases.yml',
        'entries':entries,'skipped':skipped}
     manifest=root/'manifest.json'

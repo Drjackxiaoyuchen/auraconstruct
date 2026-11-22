@@ -2,6 +2,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import json
 import subprocess
+import hashlib
 
 import pytest
 
@@ -99,3 +100,54 @@ def test_index_keeps_resolved_context_alternatives_and_explicit_cds_type(tmp_pat
     assert result['entries']==1 and result['skipped']==0 and entry['type']=='CDS' and entry['role']=='cds'
     assert entry['role_resolution']=='source-semantics' and entry['role_alternatives']==['cds','generic']
     assert entry['type_alternatives']==['CDS','gene'] and stats(db)['observations']==2
+
+
+@pytest.mark.parametrize('context_role',['generic','region','engineered_region'])
+def test_parts_profile_audits_excluded_context_without_changing_source_snapshot(tmp_path,monkeypatch,context_role):
+    db=seeded(tmp_path);c=source();c.sequence+='ACGATCGTAGCTAGTCAGCA';c.name='wrapped'
+    c.features=[Feature('context','Broad context','misc_feature',context_role,[[0,40]],1)]
+    ingest(to_genbank(c),'context.gb',source_url='https://example.org/context',license_notice='context terms',path=db)
+    before=stats(db);fake_builder(monkeypatch)
+    full=tmp_path/'source';parts=tmp_path/'parts'
+    assert library_index.build_index(full,db)['entries']==2
+    result=library_index.build_index(parts,db,profile='parts')
+    m=json.loads((parts/'manifest.json').read_text())
+    assert result['profile']=='parts' and result['entries']==1 and result['skipped']==1
+    assert m['entries'][0]['type']=='CDS' and m['skipped'][0]['role']==context_role
+    assert m['skipped'][0]['source_urls']==['https://example.org/context']
+    assert m['skipped'][0]['reasons']==['context_role_excluded_by_parts_profile']
+    assert (full/'references.gb').read_bytes()==(parts/'references.gb').read_bytes()
+    assert stats(db)==before
+
+
+def test_legacy_schema_one_index_still_verifies_and_new_profile_is_integrity_checked(tmp_path,monkeypatch):
+    db=seeded(tmp_path);fake_builder(monkeypatch);out=tmp_path/'index';library_index.build_index(out,db)
+    path=out/'manifest.json';m=json.loads(path.read_text());original=json.loads(path.read_text())
+    m['profile']='parts';m['selection_policy']=library_index.PROFILES['parts'];path.write_text(json.dumps(m))
+    assert 'fingerprint mismatch' in library_index.index_status(out)['reason']
+    # Reconstruct a v0.7.1 manifest using its recorded hash contract, without a profile.
+    m=original;m['schema_version']=1;m.pop('profile')
+    keys=('schema_version','reference_revision','reference_policy','selection_policy','engine_version','method','config','entries','skipped','files')
+    m['index_fingerprint']=hashlib.sha256(json.dumps({k:m[k] for k in keys},sort_keys=True).encode()).hexdigest()
+    path.write_text(json.dumps(m))
+    assert library_index.index_status(out)['ready'] and library_index.index_status(out)['profile']=='source'
+
+
+def test_parts_profile_keeps_conflicts_excluded_and_rejects_empty_or_unknown_selection(tmp_path):
+    db=seeded(tmp_path);c=source();c.name='other';c.features[0].type='promoter';c.features[0].role='promoter'
+    ingest(to_genbank(c),'other.gb',source_url='https://example.org/other',license_notice='test',path=db)
+    with pytest.raises(ValueError,match='No conflict-free'):library_index.build_index(tmp_path/'empty',db,profile='parts')
+    with pytest.raises(ValueError,match='Unknown index profile'):library_index.build_index(tmp_path/'bad',db,profile='unknown')
+    assert not (tmp_path/'empty').exists() and not (tmp_path/'bad').exists()
+
+
+def test_index_builder_cli_passes_explicit_parts_profile(tmp_path,monkeypatch,capsys):
+    from auraconstruct.cli import main
+    captured={}
+    def build(directory,path,timeout,*,profile):
+        captured.update(directory=directory,path=path,timeout=timeout,profile=profile)
+        return {'ready':True,'profile':profile}
+    monkeypatch.setattr(library_index,'build_index',build)
+    monkeypatch.setattr('sys.argv',['auraconstruct','library','build-index','-o',str(tmp_path/'out'),'--profile','parts'])
+    main()
+    assert captured['profile']=='parts' and json.loads(capsys.readouterr().out)['profile']=='parts'

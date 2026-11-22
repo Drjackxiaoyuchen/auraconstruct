@@ -46,6 +46,7 @@ def main():
     index=libsub.add_parser('build-index',help='Build a private standalone pLannotate BLAST database')
     index.add_argument('-o','--output',required=True,type=Path);index.add_argument('--db',type=Path)
     index.add_argument('--timeout',type=int,default=180)
+    index.add_argument('--profile',choices=['source','parts'],default='source',help='parts excludes unspecified/context region roles; source retains them')
     check_index=libsub.add_parser('index-status',help='Verify private index files and provenance')
     check_index.add_argument('directory',type=Path)
     args=parser.parse_args()
@@ -70,7 +71,7 @@ def main():
         if args.library_command in ('build-index','index-status'):
             from .library_index import build_index,index_status
             try:
-                result=(build_index(args.output,args.db,args.timeout) if args.library_command=='build-index'
+                result=(build_index(args.output,args.db,args.timeout,profile=args.profile) if args.library_command=='build-index'
                         else index_status(args.directory))
             except (OSError,ValueError) as exc:parser.exit(2,f'Error: {exc}\n')
             print(json.dumps(result,indent=2))
