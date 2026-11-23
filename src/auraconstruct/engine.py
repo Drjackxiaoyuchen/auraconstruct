@@ -27,6 +27,23 @@ def environment(exe):
     return env
 
 
+def annotation_flags(mode='default'):
+    """Gate an opt-in legacy flag on installed help, not a version-name guess."""
+    if mode=='default':return []
+    if mode!='detailed':raise ValueError('Unknown annotation mode: '+str(mode))
+    exe=executable()
+    if not exe:raise ValueError('pLannotate is not installed.')
+    try:
+        help_result=subprocess.run([exe,'batch','--help'],env=environment(exe),capture_output=True,text=True,timeout=20,check=False)
+    except (OSError,subprocess.TimeoutExpired) as exc:
+        raise ValueError('Cannot check installed pLannotate detailed-mode support: '+str(exc)) from exc
+    if help_result.returncode:raise ValueError('Cannot read installed pLannotate batch help.')
+    help_text=re.sub(r'\x1b\[[0-9;]*m','',help_result.stdout)
+    if not re.search(r'^\s*[│┃|]?\s*(?:-\w,\s*)?--detailed(?=[\s,=]|$)',help_text,re.M):
+        raise ValueError('Installed pLannotate does not advertise --detailed. Use default mode; its nested-feature behavior must be evaluated separately.')
+    return ['--detailed']
+
+
 def _database_files(manifest,root):
     """Validate the manifest and keep all index reads inside the reported bundle."""
     entries=manifest.get('files')

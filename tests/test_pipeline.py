@@ -190,21 +190,28 @@ def test_plannotate_missing_and_sequence_change_protection(monkeypatch):
     with pytest.raises(ValueError,match='not installed'):plannotate(sample())
 
 
-def test_plannotate_adapter_merges_and_preserves_imports(monkeypatch):
+@pytest.mark.parametrize('mode',['default','detailed'])
+def test_plannotate_adapter_merges_and_preserves_imports(monkeypatch,mode):
     from types import SimpleNamespace
     c=sample()
     monkeypatch.setattr('auraconstruct.engine.executable',lambda:'/bin/plannotate')
     monkeypatch.setattr('auraconstruct.engine.status',lambda:{'ready':True,'version':'test','database_version':2,'database_fingerprint':'fixture'})
     def fake_run(args,**kwargs):
+        if args[1:]==['batch','--help']:return SimpleNamespace(returncode=0,stdout='  --detailed  retain different types\n',stderr='')
+        assert ('--detailed' in args)==(mode=='detailed')
+        assert kwargs['env']['PYTHONNOUSERSITE']=='1'
         out=Path(args[args.index('-o')+1])/'annotated_pLann.gbk'
         predicted=sample();predicted.features=[Feature('p1','Predicted ori','rep_origin','origin',[[3000,3200]],1)]
         out.write_bytes(to_genbank(predicted))
         return SimpleNamespace(returncode=0,stderr='',stdout='')
     monkeypatch.setattr('auraconstruct.annotate.subprocess.run',fake_run)
-    result=plannotate(c)
+    result=plannotate(c,mode=mode)
     assert len(result.features)==len(c.features)+1
     assert result.features[-1].source=='pLannotate-prediction'
     assert result.sequence==c.sequence
+    assert result.features[-1].qualifiers['ac_annotation_mode']==[mode]
+    assert result.provenance['annotation_runs'][-1]['annotation_mode']==mode
+    assert result.provenance['annotation_runs'][-1]['annotation_flags']==([] if mode=='default' else ['--detailed'])
 
 
 @pytest.mark.parametrize("demo_id",["ytk001","myt001","myt075","myt095","ysd891","ysd328","ysd328-all"])

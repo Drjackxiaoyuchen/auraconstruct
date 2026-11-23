@@ -62,18 +62,19 @@ def plannotate_available():
     return status()['ready']
 
 
-def plannotate(construct, timeout=600):
+def plannotate(construct, timeout=600, *, mode='default'):
     from . import engine
     executable = engine.executable()
     readiness=engine.status()
     if not readiness['ready']:raise ValueError(readiness['reason'])
+    flags=engine.annotation_flags(mode)
     c = deepcopy(construct)
     if c.topology == "unknown":
         raise ValueError("Set linear or circular topology before running pLannotate.")
     with tempfile.TemporaryDirectory(prefix="auraconstruct-") as tmp:
         source = Path(tmp) / "input.fa"
         source.write_text(f">construct\n{c.sequence}\n")
-        args = [executable, "batch", "-i", str(source), "-o", tmp, "-f", "annotated", '--cores', '2']
+        args = [executable, "batch", "-i", str(source), "-o", tmp, "-f", "annotated", '--cores', '2', *flags]
         if c.topology == "linear":
             args.append("--linear")
         try:
@@ -95,13 +96,14 @@ def plannotate(construct, timeout=600):
             f.id = f"plann-{len(c.features) + 1}"
             f.source = "pLannotate-prediction"
             f.qualifiers.update(ac_engine_version=[readiness['version']],ac_db_version=[str(readiness['database_version'])],
-                                ac_db_fingerprint=[readiness['database_fingerprint']])
+                                ac_db_fingerprint=[readiness['database_fingerprint']],ac_annotation_mode=[mode])
             c.features.append(f)
         if c.features:c.warnings=[w for w in c.warnings if not w.startswith('No annotations found')]
         c.warnings.append("pLannotate annotations are sequence-similarity predictions. Review boundaries and function.")
         if not c.features:c.warnings.append('pLannotate found no matching features in this sequence.')
         runs=c.provenance.setdefault('annotation_runs',[])
         runs.append({'engine':'pLannotate','version':readiness['version'],
+                     'annotation_mode':mode,'annotation_flags':flags,
                      'database_version':readiness['database_version'],'database_fingerprint':readiness['database_fingerprint'],
                      'time_utc':datetime.now(timezone.utc).isoformat(),'sequence_sha256':hashlib.sha256(c.sequence.encode()).hexdigest(),
                      'topology':c.topology,'features_added':len(c.features)-len(construct.features),

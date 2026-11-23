@@ -72,18 +72,21 @@ def test_comparison_rejects_changed_sequence_or_framing(change):
     with pytest.raises(ValueError,match='identical DNA and topology'):compare_annotations(a,b)
 
 
-def test_validation_withholds_annotations_and_saves_checksummed_native_exports(tmp_path,monkeypatch):
+@pytest.mark.parametrize('annotation_mode',['default','detailed'])
+def test_validation_withholds_annotations_and_saves_checksummed_native_exports(tmp_path,monkeypatch,annotation_mode):
     source=construct([feature('source-a',10,40),feature('source-b',100,130)])
     source.provenance={'private_source_note':'not engine input'}
     raw=to_genbank(source);path=tmp_path/'source.gb';path.write_bytes(raw)
-    def fake(query):
+    def fake(query,*,mode):
+        assert mode==annotation_mode
         assert query.features==[] and query.provenance=={} and query.sequence==source.sequence
         result=deepcopy(query);result.features=[feature('predicted',10,40,label='Different label')]
         result.features[0].source='pLannotate-prediction';return result
     monkeypatch.setattr('auraconstruct.validation.plannotate',fake)
-    output=tmp_path/'run';report=validate_annotation(path,output)
+    output=tmp_path/'run';report=validate_annotation(path,output,annotation_mode=annotation_mode)
     assert report['status']=='completed' and report['withheld_features']==2 and report['engine_input_features']==0
     assert report['source_feature_types']=={'CDS':2} and report['comparison']['assessment_available']
+    assert report['annotation_mode']==annotation_mode
     assert report['sequence_unchanged'] and report['comparison']['summary']['unambiguous_pairs']==1
     assert (output/'source-input.bin').read_bytes()==raw
     query=read_bytes((output/'query.fa').read_bytes(),'query.fa')[0];assert not query.features and query.sequence==source.sequence
@@ -96,7 +99,7 @@ def test_validation_withholds_annotations_and_saves_checksummed_native_exports(t
 
 def test_failed_engine_run_is_recorded_without_a_completed_figure(tmp_path,monkeypatch):
     path=tmp_path/'source.gb';path.write_bytes(to_genbank(construct([feature('a',10,40)])))
-    def fail(query):raise ValueError('Search tool failed')
+    def fail(query,*,mode):raise ValueError('Search tool failed')
     monkeypatch.setattr('auraconstruct.validation.plannotate',fail)
     output=tmp_path/'failed'
     with pytest.raises(ValueError,match='Search tool failed'):validate_annotation(path,output)
@@ -111,3 +114,21 @@ def test_validation_cli_requires_explicit_topology_for_unknown_inputs(tmp_path,m
     monkeypatch.setattr('sys.argv',['auraconstruct','validate-annotation',str(path),'-o',str(tmp_path/'run')])
     with pytest.raises(SystemExit) as exc:main()
     assert exc.value.code==2 and 'Set linear or circular topology' in capsys.readouterr().err
+
+
+def test_validation_cli_passes_annotation_mode(tmp_path,monkeypatch,capsys):
+    from auraconstruct.cli import main
+    def fake(input_path,output,**kwargs):
+        assert kwargs['annotation_mode']=='detailed'
+        return {'status':'completed','predictions':0,'comparison':{'assessment_available':False,'assessment_note':'No source features','summary':{}}}
+    monkeypatch.setattr('auraconstruct.validation.validate_annotation',fake)
+    monkeypatch.setattr('sys.argv',['auraconstruct','validate-annotation','source.gb','-o',str(tmp_path/'run'),'--annotation-mode','detailed'])
+    main();assert json.loads(capsys.readouterr().out)['status']=='completed'
+
+
+def test_export_rejects_annotation_mode_without_an_annotation_request(tmp_path,monkeypatch,capsys):
+    from auraconstruct.cli import main
+    monkeypatch.setattr('sys.argv',['auraconstruct','export','source.gb','-o',str(tmp_path/'figure.pptx'),'--annotation-mode','detailed'])
+    with pytest.raises(SystemExit) as exc:main()
+    assert exc.value.code==2 and 'requires --annotate plannotate' in capsys.readouterr().err
+    assert not (tmp_path/'figure.pptx').exists()

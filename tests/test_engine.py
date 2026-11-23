@@ -1,5 +1,6 @@
 import json
 import hashlib
+import subprocess
 from types import SimpleNamespace
 import pytest
 
@@ -85,3 +86,39 @@ def test_doctor_cli_emits_json_and_a_machine_readable_exit_status(monkeypatch,ca
         with pytest.raises(SystemExit) as exc:main()
         assert exc.value.code==1
     assert json.loads(capsys.readouterr().out)['ready']==ready
+
+
+def test_default_annotation_mode_requires_no_help_probe_and_unknown_modes_fail(monkeypatch):
+    def unexpected(*a,**k):raise AssertionError('Default mode must not probe help.')
+    monkeypatch.setattr(engine.subprocess,'run',unexpected)
+    assert engine.annotation_flags('default')==[]
+    with pytest.raises(ValueError,match='Unknown annotation mode'):engine.annotation_flags('unknown')
+
+
+@pytest.mark.parametrize('help_text',['│    --detailed    -d   retain nested calls\n','  \x1b[1m--detailed\x1b[0m  retain nested calls\n'])
+def test_detailed_mode_checks_installed_isolated_help(monkeypatch,help_text):
+    monkeypatch.setattr(engine,'executable',lambda:'/isolated/bin/plannotate')
+    def probe(args,**kwargs):
+        assert args==['/isolated/bin/plannotate','batch','--help'] and kwargs['timeout']==20
+        assert kwargs['env']['PYTHONNOUSERSITE']=='1'
+        return SimpleNamespace(returncode=0,stdout=help_text,stderr='')
+    monkeypatch.setattr(engine.subprocess,'run',probe)
+    assert engine.annotation_flags('detailed')==['--detailed']
+
+
+@pytest.mark.parametrize('help_text',['  --detailed-mode  a different option\n','  Remove --detailed from old command lines.\n'])
+def test_missing_legacy_flag_is_not_assumed_supported_from_version_or_mentions(monkeypatch,help_text):
+    monkeypatch.setattr(engine,'executable',lambda:'/isolated/bin/plannotate')
+    monkeypatch.setattr(engine.subprocess,'run',lambda *a,**k:SimpleNamespace(returncode=0,stdout=help_text,stderr=''))
+    with pytest.raises(ValueError,match='does not advertise'):engine.annotation_flags('detailed')
+
+
+@pytest.mark.parametrize('failure',['nonzero','timeout','oserror'])
+def test_detailed_help_probe_errors_prevent_search(monkeypatch,failure):
+    monkeypatch.setattr(engine,'executable',lambda:'/isolated/bin/plannotate')
+    def probe(*a,**k):
+        if failure=='timeout':raise subprocess.TimeoutExpired(a[0],20)
+        if failure=='oserror':raise OSError('Cannot execute')
+        return SimpleNamespace(returncode=2,stdout='',stderr='Unsupported')
+    monkeypatch.setattr(engine.subprocess,'run',probe)
+    with pytest.raises(ValueError,match='Cannot'):engine.annotation_flags('detailed')

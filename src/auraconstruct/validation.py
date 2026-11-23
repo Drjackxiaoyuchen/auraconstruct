@@ -85,7 +85,7 @@ def compare_annotations(reference,predicted,feature_type='CDS',minimum_overlap=.
                              'Fuzzy/unknown/mixed-strand features are excluded from agreement counts. Duplicates and ambiguous overlaps remain explicit.'}
 
 
-def validate_annotation(input_path,output_dir,*,topology=None,feature_type='CDS',minimum_overlap=.9):
+def validate_annotation(input_path,output_dir,*,topology=None,feature_type='CDS',minimum_overlap=.9,annotation_mode='default'):
     """Run pLannotate on DNA alone; retain the original for comparison only afterwards."""
     input_path=Path(input_path);output_dir=Path(output_dir)
     raw=input_path.read_bytes();records=read_bytes(raw,input_path.name)
@@ -95,12 +95,14 @@ def validate_annotation(input_path,output_dir,*,topology=None,feature_type='CDS'
     if reference.topology not in ('linear','circular'):raise ValueError('Set linear or circular topology before validation.')
     # Validate comparison options before starting a potentially long search.
     _check_options(feature_type,minimum_overlap)
+    if annotation_mode not in ('default','detailed'):raise ValueError('Unknown annotation mode: '+str(annotation_mode))
     output_dir.mkdir(parents=True,exist_ok=False)
     query=Construct(reference.id,reference.name,reference.sequence,reference.topology,[],input_path.name,'fasta')
     report={'schema_version':1,'status':'running','started_utc':datetime.now(timezone.utc).isoformat(),
             'input_name':input_path.name,'input_raw_sha256':hashlib.sha256(raw).hexdigest(),
             'sequence_sha256':hashlib.sha256(query.sequence.encode()).hexdigest(),'length':query.length,
-            'topology':query.topology,'withheld_features':len(reference.features),'engine_input_features':0}
+            'topology':query.topology,'withheld_features':len(reference.features),'engine_input_features':0,
+            'annotation_mode':annotation_mode}
     report['source_feature_types']=dict(Counter(f.type for f in reference.features))
     report_path=output_dir/'report.json'
     def save():report_path.write_text(json.dumps(report,indent=2))
@@ -108,7 +110,7 @@ def validate_annotation(input_path,output_dir,*,topology=None,feature_type='CDS'
     try:
         (output_dir/'source-input.bin').write_bytes(raw)
         (output_dir/'query.fa').write_text('>query\n'+query.sequence+'\n')
-        predicted=plannotate(query)
+        predicted=plannotate(query,mode=annotation_mode)
         comparison=compare_annotations(reference,predicted,feature_type,minimum_overlap)
         pages=build_pages(predicted,layout='singleline',palette='aureka',coordinates=True,detail='detailed')
         if len(pages)!=1:raise ValueError('Single-line validation export did not produce exactly one figure page.')

@@ -25,6 +25,7 @@ def main():
     validation.add_argument('--topology',choices=['linear','circular'])
     validation.add_argument('--feature-type',default='CDS')
     validation.add_argument('--minimum-overlap',type=float,default=.9)
+    validation.add_argument('--annotation-mode',choices=['default','detailed'],default='default')
     export=sub.add_parser("export",help="Export one or more sequence files")
     export.add_argument("inputs",nargs="+",type=Path)
     export.add_argument("-o","--output",type=Path,required=True)
@@ -33,6 +34,7 @@ def main():
     export.add_argument("--coordinates",action="store_true")
     export.add_argument("--detail",choices=["overview","detailed"],default="detailed")
     export.add_argument("--annotate",choices=["plannotate"])
+    export.add_argument('--annotation-mode',choices=['default','detailed'],default='default')
     export.add_argument("--reference",type=Path)
     export.add_argument("--topology",choices=["linear","circular"])
     lib=sub.add_parser('library',help='Manage the private local DNA reference library')
@@ -54,7 +56,7 @@ def main():
         from .validation import validate_annotation
         try:
             report=validate_annotation(args.input,args.output,topology=args.topology,
-                                       feature_type=args.feature_type,minimum_overlap=args.minimum_overlap)
+                                       feature_type=args.feature_type,minimum_overlap=args.minimum_overlap,annotation_mode=args.annotation_mode)
         except (OSError,ValueError) as exc:parser.exit(2,f'Error: {exc}\n')
         print(json.dumps({'status':report['status'],'report':str(args.output/'report.json'),
                           'predictions':report['predictions'],'assessment_available':report['comparison']['assessment_available'],
@@ -93,6 +95,7 @@ def main():
         create_app().run(host="127.0.0.1",port=args.port,debug=False)
         return
     constructs=[]
+    if args.annotation_mode!='default' and not args.annotate:parser.error('--annotation-mode detailed requires --annotate plannotate')
     try:
         for path in args.inputs:
             for c in read_bytes(path.read_bytes(),path.name):
@@ -101,7 +104,7 @@ def main():
                 if args.reference:
                     c=exact_annotate(c,args.reference.read_bytes(),args.reference.name)
                 if args.annotate:
-                    c=plannotate(c)
+                    c=plannotate(c,mode=args.annotation_mode)
                 constructs.append(c)
         pages=[p for c in constructs for p in build_pages(c,args.layout,args.palette,args.coordinates,detail=args.detail)]
         out=args.output

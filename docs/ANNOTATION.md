@@ -31,6 +31,15 @@ Run `auraconstruct doctor --verify-databases` after installation, a database cha
 
 The adapter writes one temporary FASTA, invokes `plannotate batch -i INPUT -o OUTPUT -f annotated --cores 2`, adds `--linear` for linear DNA, and reads its annotated GenBank output. It requires explicit linear/circular topology. Temporary files are deleted after the operation. The default timeout is 600 seconds. The child process prepends its own search-tool directory and disables unrelated Python user-site packages; processing stays on the machine running the app.
 
+From v0.7.3, CLI validation/export can request `--annotation-mode detailed`. This probes the installed engine's isolated `batch --help` and adds the legacy `--detailed` flag only when it is advertised as an option. Engines without that flag produce an explicit error; absence does not establish what their default nested-feature policy does. `--annotation-mode default` adds no mode flag and keeps existing studio/default behavior. The requested mode and flags are recorded in run provenance, and new GenBank predictions retain `ac_annotation_mode`. Illustration `--detail` controls figure callouts separately from engine annotation mode.
+
+```bash
+auraconstruct validate-annotation source.gb -o PRIVATE_NEW_DIRECTORY --annotation-mode detailed
+auraconstruct export source.gb --annotate plannotate --annotation-mode detailed -o map.pptx
+```
+
+Legacy detailed mode can retain overlapping annotations of different source types, including additional fragments that need review. More calls do not establish better biological accuracy. Compare runs with original annotations withheld and preserve imported features rather than replacing them.
+
 The input and output sequence must match exactly before features are merged. Predictions append with source `pLannotate-prediction`; imported features remain. Engine version, database version/fingerprint, query sequence hash and run timestamp are recorded in project provenance. Generated GenBank features retain engine/database identifiers and the search evidence supplied by pLannotate. Single-line editable PPTX export works on the resulting model.
 
 ## Live validation, 2026-11-14
