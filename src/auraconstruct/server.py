@@ -54,9 +54,9 @@ def create_app():
     def status():
         from .demos import catalog
         from .library import stats
-        from .engine import status as engine_status
+        from .engine import status as engine_status,annotation_modes
         engine=engine_status()
-        return jsonify(version=__version__, plannotate=engine['ready'],annotation_engine=engine, roles=ROLES,
+        return jsonify(version=__version__, plannotate=engine['ready'],annotation_engine=engine,annotation_modes=annotation_modes(engine),roles=ROLES,
                        palettes=PALETTES, role_color_indices=COLORS, demos=catalog(),library=stats())
 
     @app.get("/api/demo")
@@ -91,7 +91,9 @@ def create_app():
                 from .library import annotate_library
                 c=annotate_library(from_dict(data['record']))
             elif data.get('engine')=='plannotate':
-                c = plannotate(from_dict(data["record"]))
+                mode=data.get('annotation_mode','default')
+                if mode not in ('default','detailed'):raise ValueError('Unknown annotation mode: '+str(mode))
+                c = plannotate(from_dict(data["record"]),mode=mode)
             else:raise ValueError("Choose pLannotate or the local library engine.")
         else:
             c = from_dict(json.loads(request.form["record"]))

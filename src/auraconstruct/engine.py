@@ -44,6 +44,19 @@ def annotation_flags(mode='default'):
     return ['--detailed']
 
 
+def annotation_modes(readiness):
+    """Report mode-specific availability without conflating it with base readiness."""
+    ready=bool(readiness.get('ready'))
+    modes={'default':{'available':ready,'reason':'Uses the installed engine’s default search.' if ready else readiness['reason']},
+           'detailed':{'available':False,'reason':'Detailed search requires a ready local annotation engine.'}}
+    if ready:
+        try:annotation_flags('detailed')
+        except ValueError as exc:
+            modes['detailed'].update(reason='Detailed search could not be verified. Use Default search or check the local engine.',diagnostic=str(exc))
+        else:modes['detailed'].update(available=True,reason='Includes additional overlapping feature types. Review boundaries and fragment calls.')
+    return modes
+
+
 def _database_files(manifest,root):
     """Validate the manifest and keep all index reads inside the reported bundle."""
     entries=manifest.get('files')

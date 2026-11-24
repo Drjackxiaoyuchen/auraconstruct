@@ -122,3 +122,27 @@ def test_detailed_help_probe_errors_prevent_search(monkeypatch,failure):
         return SimpleNamespace(returncode=2,stdout='',stderr='Unsupported')
     monkeypatch.setattr(engine.subprocess,'run',probe)
     with pytest.raises(ValueError,match='Cannot'):engine.annotation_flags('detailed')
+
+
+def test_mode_availability_does_not_probe_an_unready_engine(monkeypatch):
+    def unexpected(*a,**k):raise AssertionError('Unready engine must not be probed.')
+    monkeypatch.setattr(engine,'annotation_flags',unexpected)
+    result=engine.annotation_modes({'ready':False,'reason':'Database unavailable'})
+    assert not result['default']['available'] and not result['detailed']['available']
+    assert result['default']['reason']=='Database unavailable'
+
+
+def test_mode_availability_keeps_default_usable_when_detailed_probe_fails(monkeypatch):
+    def unsupported(mode):raise ValueError('Installed flag is absent')
+    monkeypatch.setattr(engine,'annotation_flags',unsupported)
+    result=engine.annotation_modes({'ready':True})
+    assert result['default']['available'] and not result['detailed']['available']
+    assert result['detailed']['diagnostic']=='Installed flag is absent'
+
+
+def test_mode_availability_uses_the_existing_capability_gate(monkeypatch):
+    calls=[]
+    def supported(mode):calls.append(mode);return ['--detailed']
+    monkeypatch.setattr(engine,'annotation_flags',supported)
+    result=engine.annotation_modes({'ready':True})
+    assert calls==['detailed'] and all(item['available'] for item in result.values())

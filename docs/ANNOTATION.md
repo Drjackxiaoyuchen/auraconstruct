@@ -40,6 +40,8 @@ auraconstruct export source.gb --annotate plannotate --annotation-mode detailed 
 
 Legacy detailed mode can retain overlapping annotations of different source types, including additional fragments that need review. More calls do not establish better biological accuracy. Compare runs with original annotations withheld and preserve imported features rather than replacing them.
 
+From v0.7.4, the studio's **pLannotate search** selector offers **Default search** and **Include overlapping features**. Default remains selected initially. `/api/status` reports base readiness and per-mode availability separately, using the installed capability gate; inability to verify detailed mode leaves default search usable. The selector and run button are disabled during a run, and the chosen mode is sent explicitly to `/api/annotate`. That endpoint defaults older requests to `default`, rejects unknown modes and rechecks support before search. Mode selection affects the next requested annotation, while the applied mode remains in the resulting project/GenBank provenance. Figure detail continues to control callouts independently.
+
 The input and output sequence must match exactly before features are merged. Predictions append with source `pLannotate-prediction`; imported features remain. Engine version, database version/fingerprint, query sequence hash and run timestamp are recorded in project provenance. Generated GenBank features retain engine/database identifiers and the search evidence supplied by pLannotate. Single-line editable PPTX export works on the resulting model.
 
 ## Live validation, 2026-11-14

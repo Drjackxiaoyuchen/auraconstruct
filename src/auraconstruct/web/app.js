@@ -5,6 +5,14 @@ const roles={promoter:'Promoter',rbs:'Ribosome entry site',cds:'Coding sequence'
 Object.assign(roles,{region:'Unspecified region',engineered_region:'Engineered region',spacer:'Inert DNA spacer',nuclease_site:'Nuclease cleavage site'});
 let palettes={aureka:['#4200AC','#F9AC2F','#6500FF','#FF6D8E','#6FC0A9','#8882BE','#555656']};
 let roleColorIndices={promoter:0,rbs:1,cds:2,terminator:3,origin:4,operator:5,generic:6};
+let annotationModes={default:{available:false},detailed:{available:false}},annotationRunning=false;
+function syncAnnotationControls(){
+  const mode=$('annotationMode').value;
+  $('annotationMode').querySelector('[value="detailed"]').disabled=!annotationModes.detailed?.available;
+  $('annotationMode').disabled=annotationRunning||!annotationModes.default?.available;
+  $('plannotate').disabled=annotationRunning||!annotationModes[mode]?.available;
+  $('annotationModeNote').textContent=annotationModes[mode]?.reason||'Checking search modes…';
+}
 function defaultColor(role){return (palettes[state.options.palette]||palettes.aureka)[roleColorIndices[role]??6];}
 const headers={'X-AuraConstruct':'1'};
 let renderTimer,renderVersion=0;
@@ -127,19 +135,22 @@ $('referenceInput').addEventListener('change',guarded(async e=>{
   notice('Matching exact reference sequences on both strands…');const form=new FormData();form.append('record',JSON.stringify(current()));form.append('reference',e.target.files[0]);
   const res=await api('/api/annotate',form,false);state.records[state.index]=(await res.json()).record;selectRecord(state.index);notice('Exact reference matches added. Review the new annotations.');e.target.value='';
 }));
+$('annotationMode').addEventListener('change',syncAnnotationControls);
 $('plannotate').addEventListener('click',guarded(async()=>{
   if(!current())throw Error('Load a construct first.');
+  const mode=$('annotationMode').value;
+  if(!annotationModes[mode]?.available)throw Error('The selected annotation mode is unavailable.');
   notice('Running pLannotate locally. Large databases may take several minutes…');
-  $('plannotate').disabled=true;
+  annotationRunning=true;syncAnnotationControls();
   try{
     const records=state.records,index=state.index,record=current(),snapshot=JSON.stringify(record),before=record.features.length;
-    const res=await api('/api/annotate',{record,engine:'plannotate'});const annotated=(await res.json()).record;
+    const res=await api('/api/annotate',{record,engine:'plannotate',annotation_mode:mode});const annotated=(await res.json()).record;
     if(state.records!==records||records[index]!==record||JSON.stringify(record)!==snapshot){
       throw Error('The input changed while pLannotate was running. Your edits were preserved; run annotation again on the current input.');
     }
     state.records[index]=annotated;if(state.index===index)selectRecord(index);
-    notice(`${record.name}: pLannotate finished with ${annotated.features.length-before} new predictions. Review boundaries, fragments and roles before exporting.`);
-  }finally{$('plannotate').disabled=false;}
+    notice(`${record.name}: ${mode==='detailed'?'Overlapping-feature':'Default'} search finished with ${annotated.features.length-before} new predictions. Review boundaries, fragments and roles before exporting.`);
+  }finally{annotationRunning=false;syncAnnotationControls();}
 }));
 $('projectInput').addEventListener('change',guarded(async e=>{
   const file=e.target.files[0];if(!file)return;
@@ -159,7 +170,9 @@ $('featureForm').addEventListener('submit',guarded(async e=>{
 }));
 guarded(async()=>{
   const res=await fetch('/api/status');const s=await res.json();palettes=s.palettes||palettes;roleColorIndices=s.role_color_indices||roleColorIndices;
-  $('version').textContent=`v${s.version}`;$('plannotate').disabled=!s.plannotate;
+  $('version').textContent=`v${s.version}`;
+  annotationModes=s.annotation_modes||{default:{available:!!s.plannotate,reason:'Uses the installed engine’s default search.'},detailed:{available:false,reason:'Detailed search could not be verified. Use Default search.'}};
+  syncAnnotationControls();
   $('annotationStatus').textContent=s.plannotate?`${s.annotation_engine?.version||'pLannotate'} ready / database bundle ${s.annotation_engine?.database_version||'verified'}.`:(s.annotation_engine?.reason||'pLannotate is not ready. Exact reference matching is available.');
   const params=new URLSearchParams(location.search),demo=params.get('demo');
   if(['singleline','schematic','proportional'].includes(params.get('layout')))state.options.layout=params.get('layout');
