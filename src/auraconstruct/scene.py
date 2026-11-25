@@ -14,6 +14,7 @@ import textwrap
 from .model import ROLES, validate
 from .brand import AUREKA_COLORS, PURPLE, DEEP_PURPLE, YELLOW, INK, MUTED, FAINT, FONT, LOGO
 from .details import category, summary, position_text, short_sequence
+from .annotation_history import annotation_summary
 
 W, H = 1440, 810
 PALETTES = {
@@ -163,6 +164,7 @@ def _header(c, page_number, page_count, layout, selected):
     p.text(f"{page_number} / {page_count}", 1264, 765, 100, 14, MUTED, align="right")
     label=c.provenance.get('display_citation','')
     runs=c.provenance.get('annotation_runs',[])
+    runs=[r for r in runs if isinstance(r,dict)] if isinstance(runs,list) else []
     if not label and runs:
         last=runs[-1]
         label=f"Annotation: {last.get('version',last.get('engine','unknown'))} / database bundle {last.get('database_version','unknown')} / sequence-based predictions"
@@ -176,6 +178,10 @@ def _header(c, page_number, page_count, layout, selected):
     if c.provenance:
         import json
         p.notes += "\nConstruct provenance: " + json.dumps(c.provenance, ensure_ascii=False) + "\n"
+    history=annotation_summary(c)
+    if history['last_run']:
+        last=history['last_run']
+        p.notes += f"\nLast recorded pLannotate run: {last['mode_label']}. {last['query_message']} {history['note']}\n"
     p.notes += "\nBranding follows the owner-supplied Aureka 2026 presentation template. Original Aureka wordmark retained.\n"
     return p
 

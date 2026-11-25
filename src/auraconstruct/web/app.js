@@ -26,9 +26,20 @@ async function api(path,body,json=true){
 }
 function guarded(fn){return async (...args)=>{try{await fn(...args);}catch(e){notice(e.message,true);}};}
 function optionsFor(record){return {record,options:state.options};}
+function showAnnotationSummary(summary){
+  const panel=$('annotationSummary');
+  if(!summary||typeof summary!=='object'){panel.hidden=true;return;}
+  const run=summary.last_run;panel.hidden=false;
+  panel.classList.toggle('changed',run?.query_status==='changed');
+  $('appliedMode').hidden=!run;$('appliedMode').textContent=run?.mode_label||'';
+  $('runDetails').textContent=run?[run.engine_version||'Engine version not recorded',`Database ${run.database_version||'not recorded'}`,run.time_utc||'Time not recorded',run.features_added===null?null:`${run.features_added} predictions added by this run`].filter(Boolean).join(' / '):'No pLannotate run history is recorded. Feature annotations may still be present in the imported file.';
+  $('queryStatus').textContent=run?.query_message||'';
+  $('historyNote').textContent=run?`${summary.note} The search selector controls the next run.`:'Importing a file does not establish how its existing annotations were produced.';
+}
 function selectRecord(index){
   state.index=index;state.page=0;
   const c=current();if(!c)return;
+  $('annotationSummary').hidden=true;
   $('figureTitle').textContent=c.name;
   $('meta').textContent=`${c.length.toLocaleString()} bp / ${c.topology} / ${c.source_format} / ${c.source_name}`;
   $('topology').value=c.topology;
@@ -46,8 +57,10 @@ function scheduleRender(){clearTimeout(renderTimer);renderTimer=setTimeout(guard
 async function render(){
   if(!current())return;
   const version=++renderVersion;
-  const res=await api('/api/render',optionsFor(current()));
-  const data=await res.json();if(version!==renderVersion)return;
+    const record=current(),snapshot=JSON.stringify(record);
+    const res=await api('/api/render',optionsFor(record));
+    const data=await res.json();if(version!==renderVersion||current()!==record||JSON.stringify(record)!==snapshot)return;
+    showAnnotationSummary(data.annotation_summary);
   state.pages=data.pages;state.page=Math.min(state.page,data.pages.length-1);showPage();
 }
 function showPage(){

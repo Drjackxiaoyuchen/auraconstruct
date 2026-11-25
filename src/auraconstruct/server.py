@@ -11,6 +11,7 @@ from werkzeug.exceptions import HTTPException
 
 from . import __version__
 from .annotate import exact_annotate, plannotate
+from .annotation_history import annotation_summary
 from .model import ROLES
 from .sequence_io import read_bytes, from_dict, to_genbank
 from .scene import build_pages, to_svg, PALETTES, COLORS
@@ -81,7 +82,7 @@ def create_app():
         data = request.get_json()
         c = from_dict(data["record"])
         pages = build_pages(c, **options(data))
-        return jsonify(pages=[to_svg(p) for p in pages])
+        return jsonify(pages=[to_svg(p) for p in pages],annotation_summary=annotation_summary(c))
 
     @app.post("/api/annotate")
     def annotate():

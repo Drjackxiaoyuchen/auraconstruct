@@ -142,6 +142,12 @@ h2{font-weight:600}
 .sequence-source{margin:-4px 0 18px;font-size:11px;color:#707684}
 .sequence-source a{color:#4200ac;text-decoration:none}
 .sequence-source a:hover{text-decoration:underline}
+.annotation-summary{padding:14px 16px;margin:0 0 18px;background:#fff;border:1px solid var(--line);border-left:3px solid #8882be;border-radius:5px;font-size:11px;color:var(--muted);line-height:1.6;overflow-wrap:anywhere}
+.run-summary-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:#4200ac}
+.mode-badge{background:#f0eaff;color:#4200ac;padding:2px 8px;border-radius:10px}
+.annotation-summary p{margin:5px 0}
+.annotation-summary small{font-size:10px}
+.annotation-summary.changed{border-left-color:#f9ac2f;background:#fffdf8}
 .dropzone{border-color:#cbb6f0}
 .empty h3{font-weight:600}
 .table-heading h2 span{background:#f0eaff;color:#4200ac}
