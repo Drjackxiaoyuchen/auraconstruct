@@ -200,6 +200,9 @@ def _feature_notes(p, features):
             p.notes += "; original label: " + " / ".join(original)
         caption, caption_source=summary(f)
         if caption:p.notes += f"; caption ({caption_source}): {caption}"
+        if f.qualifiers:
+            import json
+            p.notes += '\nRecorded qualifiers (source/engine claims, original units): ' + json.dumps(f.qualifiers,ensure_ascii=False)
 
 
 def build_pages(c, layout="singleline", palette="aureka", coordinates=False, title=None, detail="overview"):

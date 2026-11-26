@@ -109,3 +109,20 @@ This standalone index is intended for evaluation. Deposited labels can be incomp
 ## Interpretation
 
 Imported annotations may themselves be wrong. Exact matches and pLannotate calls produce sequence-based assignments. User edits are manual decisions. None is an experimentally validated function, expression result, or binding measurement merely because a figure displays it.
+
+## Per-feature evidence review
+
+Choose **Review evidence** in the feature table to inspect the original type,
+annotation source, glyph assignment, explicit fragment flag and all recorded
+qualifiers. Values retain their original units: a score named `identity` is not
+automatically converted into a percentage or interpreted as biological function.
+Missing or unfamiliar fragment flags stay unknown; `False` does not verify completeness.
+
+The review lists annotations sharing occupied sequence intervals, including hidden
+and opposite-strand features. Joined gaps and touching boundaries do not count.
+“Within”, “contains” and “same span” describe coordinates only; they do not infer
+regulation, component identity or parent/child biological relationships. Reviewing
+does not change the sequence, annotations or illustration visibility.
+
+PowerPoint notes retain the visible features' raw qualifiers alongside their source
+and coordinates. The construct remains a single line with native editable glyphs.

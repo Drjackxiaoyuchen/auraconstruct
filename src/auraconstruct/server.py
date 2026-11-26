@@ -102,6 +102,12 @@ def create_app():
             c = exact_annotate(c,ref.read(),ref.filename or "reference.fa")
         return jsonify(record=c.to_dict())
 
+    @app.post('/api/feature-review')
+    def review_feature():
+        from .feature_review import feature_review
+        data=request.get_json()
+        return jsonify(feature_review(from_dict(data['record']),data['feature_id']))
+
     @app.post("/api/export/<fmt>")
     def export(fmt):
         data = request.get_json()

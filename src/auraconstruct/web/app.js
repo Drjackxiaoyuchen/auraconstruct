@@ -15,7 +15,7 @@ function syncAnnotationControls(){
 }
 function defaultColor(role){return (palettes[state.options.palette]||palettes.aureka)[roleColorIndices[role]??6];}
 const headers={'X-AuraConstruct':'1'};
-let renderTimer,renderVersion=0;
+let renderTimer,renderVersion=0,reviewVersion=0;
 const current=()=>state.records[state.index];
 
 function notice(text,error=false){const n=$('notification');n.textContent=text;n.className=error?'error':'';n.hidden=!text;}
@@ -37,6 +37,8 @@ function showAnnotationSummary(summary){
   $('historyNote').textContent=run?`${summary.note} The search selector controls the next run.`:'Importing a file does not establish how its existing annotations were produced.';
 }
 function selectRecord(index){
+  reviewVersion++;
+  $('reviewDialog').close();
   state.index=index;state.page=0;
   const c=current();if(!c)return;
   $('annotationSummary').hidden=true;
@@ -96,10 +98,28 @@ function updateTable(){
     const color=document.createElement('input');color.type='color';color.value=f.color||defaultColor(f.role);color.setAttribute('aria-label',`Color for ${f.label}`);color.addEventListener('input',()=>{f.color=color.value;scheduleRender();});row.append(td(color));
     const module=input(f.module,v=>{f.module=v;scheduleRender();},'No module');module.maxLength=100;module.setAttribute('aria-label','Module name');row.append(td(module));
     const caption=input(f.caption||'',v=>{f.caption=v;f.caption_source='user-caption';scheduleRender();},'Use source note');caption.maxLength=400;caption.setAttribute('aria-label','Annotation callout');row.append(td(caption));
-    const evidence=document.createElement('span');evidence.className='evidence'+(f.role_source==='label-heuristic'?' heuristic':'');evidence.textContent=`${f.source} / ${f.role_source}`;evidence.title=`Original type: ${f.type}\n${JSON.stringify(f.qualifiers,null,2)}`;row.append(td(evidence));return row;
+    const evidence=document.createElement('div');evidence.className='evidence'+(f.role_source==='label-heuristic'?' heuristic':'');
+    const origin=document.createElement('span');origin.textContent=`${f.source} / ${f.role_source}`;evidence.append(origin);
+    const review=document.createElement('button');review.className='review-button';review.textContent='Review evidence';review.setAttribute('aria-label',`Review evidence for ${f.label}`);
+    review.addEventListener('click',guarded(()=>reviewFeature(f.id)));evidence.append(review);row.append(td(evidence));return row;
   });
   $('featureTable').replaceChildren(...rows);
 }
+async function reviewFeature(id){
+  const version=++reviewVersion,record=current(),snapshot=JSON.stringify(record);
+  const res=await api('/api/feature-review',{record,feature_id:id}),data=await res.json();
+  if(version!==reviewVersion)return;
+  if(current()!==record||JSON.stringify(record)!==snapshot)throw Error('The construct changed. Open the feature review again.');
+  $('reviewTitle').textContent=data.label;
+  $('reviewOrigin').textContent=`${data.type} / ${data.source} / glyph: ${data.role} (${data.role_source})`;
+  $('reviewFragment').textContent=data.fragment_status;
+  $('reviewNote').textContent=data.note;
+  $('reviewQualifiers').textContent=JSON.stringify(data.qualifiers,null,2);
+  $('reviewOverlapCount').textContent=`Overlapping annotations (${data.overlaps.length})`;
+  $('reviewOverlaps').replaceChildren(...data.overlaps.map(o=>{const li=document.createElement('li');li.textContent=`${o.relation}: ${o.label} / ${o.type} / ${o.shared_bp} shared bp / ${o.source}${o.visible?'':' / hidden in figure'}`;return li;}));
+  $('reviewDialog').showModal();
+}
+$('closeReview').addEventListener('click',()=>{reviewVersion++;$('reviewDialog').close();});
 function updateVisibilityCount(){
   const c=current();if(!c)return;
   $('featureCount').textContent=`${c.features.filter(f=>f.visible).length} / ${c.features.length}`;
