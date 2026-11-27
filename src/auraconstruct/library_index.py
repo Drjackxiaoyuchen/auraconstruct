@@ -7,6 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+import sqlite3
 import subprocess
 
 from Bio.Seq import Seq
@@ -33,9 +34,10 @@ def _fingerprint(manifest):
     return hashlib.sha256(json.dumps({k:manifest[k] for k in keys},sort_keys=True).encode()).hexdigest()
 
 
-def index_status(directory):
+def index_status(directory,*,check_current=False,path=None):
     """Verify recorded bytes and metadata; this does not execute an annotation query."""
-    root=Path(directory).resolve();result={'ready':False,'files_checked':0,'bytes_checked':0}
+    root=Path(directory).resolve();result={'ready':False,'files_checked':0,'bytes_checked':0,
+        'freshness':'not_checked','freshness_reason':'Current library comparison was not requested.'}
     try:
         m=json.loads((root/'manifest.json').read_text())
         if not isinstance(m,dict):raise ValueError('Index manifest must be a JSON object.')
@@ -44,14 +46,26 @@ def index_status(directory):
         if m['schema_version']==2 and (profile not in PROFILES or m.get('selection_policy')!=PROFILES[profile]):
             raise ValueError('Index profile and selection policy are inconsistent.')
         if m.get('config')!='databases.yml' or m['config'] not in m.get('files',{}):raise ValueError('Index configuration is missing.')
-        for name,path,expected in engine._database_files(m,str(root)):
-            if _sha(path)!=expected:raise ValueError('Index checksum mismatch: '+name)
-            result['files_checked']+=1;result['bytes_checked']+=path.stat().st_size
+        for name,file_path,expected in engine._database_files(m,str(root)):
+            if _sha(file_path)!=expected:raise ValueError('Index checksum mismatch: '+name)
+            result['files_checked']+=1;result['bytes_checked']+=file_path.stat().st_size
         if _fingerprint(m)!=m.get('index_fingerprint'):raise ValueError('Index manifest fingerprint mismatch.')
         result.update(ready=True,index_fingerprint=m['index_fingerprint'],reference_revision=m['reference_revision'],
                       entries=len(m['entries']),skipped=len(m['skipped']),profile=profile,config=str(root/m['config']),
                       reason='Recorded index files and provenance passed verification; query behavior is checked separately.')
     except (OSError,ValueError,KeyError,TypeError) as exc:result['reason']=str(exc)
+    if check_current:
+        if not result['ready']:
+            result['freshness_reason']='Verify index integrity before comparing the current library.'
+        else:
+            try:
+                _,revision=library.reference_genbank(path)
+                current=revision==result['reference_revision']
+                result.update(current_reference_revision=revision,freshness='current' if current else 'stale',
+                    freshness_reason=('Recorded reference snapshot matches the current eligible library export.' if current else
+                                      'Current eligible library export differs; build a new snapshot to include its changes.'))
+            except (OSError,ValueError,sqlite3.Error) as exc:
+                result.update(freshness='unavailable',freshness_reason='Current library comparison unavailable: '+str(exc))
     return result
 
 

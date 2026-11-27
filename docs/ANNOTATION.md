@@ -110,6 +110,29 @@ This standalone index is intended for evaluation. Deposited labels can be incomp
 
 Imported annotations may themselves be wrong. Exact matches and pLannotate calls produce sequence-based assignments. User edits are manual decisions. None is an experimentally validated function, expression result, or binding measurement merely because a figure displays it.
 
+## Compare a private index with the current library
+
+```bash
+auraconstruct library index-status /path/to/private/index --check-current-library
+# Compare an explicitly selected library:
+auraconstruct library index-status /path/to/private/index --check-current-library --db /path/to/library.sqlite3
+```
+
+`ready` and the command's exit status describe the recorded bundle's integrity.
+The separate `freshness` field is `not_checked` by default. With the explicit
+comparison it is `current`, `stale`, or `unavailable`. A stale snapshot can still
+pass integrity; an absent, empty or unreadable current library is unavailable,
+not proof that the snapshot is invalid. An unverified bundle is not compared.
+The comparison opens the library read-only and never creates a missing library,
+rebuilds an index, or changes the studio database.
+
+Freshness compares the complete eligible source-reference export, including its
+source URLs, terms, aliases and annotation alternatives. A newly recorded source
+context can change the revision without adding a DNA part. `current` means this
+reference snapshot matches; it does not establish query coverage, annotation
+accuracy, absence of excluded conflicts, or biological validity. Selection-profile
+exclusions remain in the versioned manifest.
+
 ## Per-feature evidence review
 
 Choose **Review evidence** in the feature table to inspect the original type,

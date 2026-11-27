@@ -151,3 +151,55 @@ def test_index_builder_cli_passes_explicit_parts_profile(tmp_path,monkeypatch,ca
     monkeypatch.setattr('sys.argv',['auraconstruct','library','build-index','-o',str(tmp_path/'out'),'--profile','parts'])
     main()
     assert captured['profile']=='parts' and json.loads(capsys.readouterr().out)['profile']=='parts'
+
+
+def test_freshness_is_separate_from_integrity_and_includes_source_context_changes(tmp_path,monkeypatch):
+    db=seeded(tmp_path);fake_builder(monkeypatch);out=tmp_path/'index';library_index.build_index(out,db,profile='parts')
+    before=stats(db);manifest=(out/'manifest.json').read_bytes()
+    checked=library_index.index_status(out,check_current=True,path=db)
+    assert checked['ready'] and checked['freshness']=='current'
+    assert checked['current_reference_revision']==checked['reference_revision']
+    # A new URL/terms observation changes reference provenance without new parts.
+    ingest(to_genbank(source()),'same.gb',source_url='https://example.org/new-context',license_notice='new terms',path=db)
+    assert stats(db)==before
+    checked=library_index.index_status(out,check_current=True,path=db)
+    assert checked['ready'] and checked['freshness']=='stale'
+    assert checked['current_reference_revision']!=checked['reference_revision']
+    assert (out/'manifest.json').read_bytes()==manifest
+
+
+def test_default_status_does_not_open_current_library(tmp_path,monkeypatch):
+    db=seeded(tmp_path);fake_builder(monkeypatch);out=tmp_path/'index';library_index.build_index(out,db)
+    def unexpected(*a,**k):raise AssertionError('No current library comparison requested.')
+    monkeypatch.setattr(library,'reference_genbank',unexpected)
+    checked=library_index.index_status(out)
+    assert checked['ready'] and checked['freshness']=='not_checked' and 'current_reference_revision' not in checked
+
+
+@pytest.mark.parametrize('mode',['missing','empty','corrupt'])
+def test_unavailable_current_library_never_invalidates_verified_snapshot_or_creates_library(tmp_path,monkeypatch,mode):
+    db=seeded(tmp_path);fake_builder(monkeypatch);out=tmp_path/'index';library_index.build_index(out,db)
+    other=tmp_path/'other.db'
+    if mode=='empty':library._connect(other).close()
+    if mode=='corrupt':other.write_bytes(b'not a SQLite database')
+    checked=library_index.index_status(out,check_current=True,path=other)
+    assert checked['ready'] and checked['freshness']=='unavailable'
+    assert 'current_reference_revision' not in checked
+    if mode=='missing':assert not other.exists()
+
+
+def test_invalid_index_is_not_compared_against_current_library(tmp_path,monkeypatch):
+    def unexpected(*a,**k):raise AssertionError('Do not compare an unverified bundle.')
+    monkeypatch.setattr(library,'reference_genbank',unexpected)
+    checked=library_index.index_status(tmp_path/'missing',check_current=True)
+    assert not checked['ready'] and checked['freshness']=='not_checked'
+    assert 'integrity' in checked['freshness_reason']
+
+
+def test_index_status_cli_reports_stale_snapshot_without_confusing_integrity_exit_status(tmp_path,monkeypatch,capsys):
+    from auraconstruct.cli import main
+    db=seeded(tmp_path);fake_builder(monkeypatch);out=tmp_path/'index';library_index.build_index(out,db)
+    ingest(to_genbank(source()),'same.gb',source_url='https://example.org/new',license_notice='new terms',path=db)
+    monkeypatch.setattr('sys.argv',['auraconstruct','library','index-status',str(out),'--check-current-library','--db',str(db)])
+    main();result=json.loads(capsys.readouterr().out)
+    assert result['ready'] and result['freshness']=='stale'

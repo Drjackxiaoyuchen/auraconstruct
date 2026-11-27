@@ -51,6 +51,8 @@ def main():
     index.add_argument('--profile',choices=['source','parts'],default='source',help='parts excludes unspecified/context region roles; source retains them')
     check_index=libsub.add_parser('index-status',help='Verify private index files and provenance')
     check_index.add_argument('directory',type=Path)
+    check_index.add_argument('--check-current-library',action='store_true',help='Compare the snapshot with the current eligible library export; does not rebuild or activate it')
+    check_index.add_argument('--db',type=Path,help='Library to compare when --check-current-library is requested')
     args=parser.parse_args()
     if args.command=='validate-annotation':
         from .validation import validate_annotation
@@ -74,7 +76,7 @@ def main():
             from .library_index import build_index,index_status
             try:
                 result=(build_index(args.output,args.db,args.timeout,profile=args.profile) if args.library_command=='build-index'
-                        else index_status(args.directory))
+                        else index_status(args.directory,check_current=args.check_current_library,path=args.db))
             except (OSError,ValueError) as exc:parser.exit(2,f'Error: {exc}\n')
             print(json.dumps(result,indent=2))
             if not result['ready']:parser.exit(1)
