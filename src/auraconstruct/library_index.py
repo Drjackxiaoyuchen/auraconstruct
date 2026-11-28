@@ -18,6 +18,8 @@ from .sequence_io import read_bytes
 SELECTION_POLICY='eligible-source-semantics-without-unresolved-conflicts-v2'
 PROFILES={'source':SELECTION_POLICY,'parts':'eligible-parts-without-context-roles-or-unresolved-conflicts-v1'}
 CONTEXT_ROLES=frozenset(('generic','region','engineered_region'))
+SEARCH_TYPE_POLICY='explicit-regulatory-role-v1'
+REGULATORY_TYPES={'promoter':'promoter','terminator':'terminator','rbs':'RBS','operator':'operator','polya':'polyA_signal'}
 
 
 def _sha(path):
@@ -30,7 +32,8 @@ def _sha(path):
 def _fingerprint(manifest):
     keys=('schema_version','reference_revision','reference_policy','selection_policy','engine_version',
           'method','config','entries','skipped','files')
-    if manifest['schema_version']==2:keys+=('profile',)
+    if manifest['schema_version']>=2:keys+=('profile',)
+    if manifest['schema_version']==3:keys+=('search_type_policy',)
     return hashlib.sha256(json.dumps({k:manifest[k] for k in keys},sort_keys=True).encode()).hexdigest()
 
 
@@ -41,10 +44,12 @@ def index_status(directory,*,check_current=False,path=None):
     try:
         m=json.loads((root/'manifest.json').read_text())
         if not isinstance(m,dict):raise ValueError('Index manifest must be a JSON object.')
-        if m.get('schema_version') not in (1,2) or m.get('status')!='ready':raise ValueError('Index build is not ready.')
+        if m.get('schema_version') not in (1,2,3) or m.get('status')!='ready':raise ValueError('Index build is not ready.')
         profile='source' if m['schema_version']==1 else m.get('profile')
-        if m['schema_version']==2 and (profile not in PROFILES or m.get('selection_policy')!=PROFILES[profile]):
+        if m['schema_version']>=2 and (profile not in PROFILES or m.get('selection_policy')!=PROFILES[profile]):
             raise ValueError('Index profile and selection policy are inconsistent.')
+        if m['schema_version']==3 and m.get('search_type_policy')!=SEARCH_TYPE_POLICY:
+            raise ValueError('Index search type policy is unsupported.')
         if m.get('config')!='databases.yml' or m['config'] not in m.get('files',{}):raise ValueError('Index configuration is missing.')
         for name,file_path,expected in engine._database_files(m,str(root)):
             if _sha(file_path)!=expected:raise ValueError('Index checksum mismatch: '+name)
@@ -52,6 +57,7 @@ def index_status(directory,*,check_current=False,path=None):
         if _fingerprint(m)!=m.get('index_fingerprint'):raise ValueError('Index manifest fingerprint mismatch.')
         result.update(ready=True,index_fingerprint=m['index_fingerprint'],reference_revision=m['reference_revision'],
                       entries=len(m['entries']),skipped=len(m['skipped']),profile=profile,config=str(root/m['config']),
+                      search_type_policy=m.get('search_type_policy') if m['schema_version']==3 else 'source-type-passthrough-v1',
                       reason='Recorded index files and provenance passed verification; query behavior is checked separately.')
     except (OSError,ValueError,KeyError,TypeError) as exc:result['reason']=str(exc)
     if check_current:
@@ -81,6 +87,12 @@ def build_index(directory,path=None,timeout=180,*,profile='source'):
                'aliases':q['library_aliases'],'source_urls':q['library_source_urls'],'licenses':q['library_licenses'],
                'role_resolution':q.get('library_role_choice',['legacy-consensus'])[0],
                'role_alternatives':q.get('library_role_alts',[f.role]),'type_alternatives':q.get('library_type_alts',[f.type])}
+        # makedb's CSV has a type column but no regulatory_class column. Encode
+        # an equivalent engine type only for explicit source semantics, never a
+        # label heuristic or a manual display-role assignment. Keep source type.
+        converted=(f.type=='regulatory' and entry['role_resolution']=='source-semantics' and f.role in REGULATORY_TYPES)
+        entry.update(engine_type=REGULATORY_TYPES[f.role] if converted else f.type,
+                     engine_type_basis='explicit-source-regulatory-role' if converted else 'source-type-passthrough')
         issues=[]
         if q.get('library_strand_issue')==['true']:issues.append('library_strand_issue')
         if q.get('library_role_issue')==['true'] and entry['role_resolution']!='source-semantics':issues.append('library_role_issue')
@@ -99,8 +111,9 @@ def build_index(directory,path=None,timeout=180,*,profile='source'):
     if version.returncode:raise ValueError('Cannot read pLannotate version: '+(version.stderr or version.stdout)[-500:])
     if not version.stdout.strip():raise ValueError('pLannotate did not report a version.')
     root=Path(directory).resolve();root.mkdir(parents=True,exist_ok=False)
-    m={'schema_version':2,'status':'building','created_utc':datetime.now(timezone.utc).isoformat(),
+    m={'schema_version':3,'status':'building','created_utc':datetime.now(timezone.utc).isoformat(),
        'reference_revision':revision,'reference_policy':library.REFERENCE_POLICY,'selection_policy':PROFILES[profile],'profile':profile,
+       'search_type_policy':SEARCH_TYPE_POLICY,
        'engine_version':version.stdout.splitlines()[0].strip(),'method':'blastn','config':'databases.yml',
        'entries':entries,'skipped':skipped}
     manifest=root/'manifest.json'
@@ -114,7 +127,7 @@ def build_index(directory,path=None,timeout=180,*,profile='source'):
             writer=csv.DictWriter(stream,fieldnames=['sseqid','name','type','blurb']);writer.writeheader()
             for e in entries:
                 blurb='Source annotation; function unverified. '+json.dumps({'library_revision':revision,**e},sort_keys=True)
-                writer.writerow(dict(sseqid=e['id'],name=e['name'],type=e['type'],blurb=blurb))
+                writer.writerow(dict(sseqid=e['id'],name=e['name'],type=e['engine_type'],blurb=blurb))
         command=[exe,'makedb','-i',str(root/'parts.fasta'),'-n','auraconstruct','-m','blastn',
                  '-c',str(root/'descriptions.csv'),'-o',str(root),'--no-builtins']
         try:result=subprocess.run(command,env=env,capture_output=True,text=True,timeout=timeout,check=False)

@@ -85,7 +85,7 @@ def infer_role(kind: str, qualifiers: dict, label: str) -> tuple[str, str]:
     reg = " ".join(qualifiers.get("regulatory_class", [])).lower()
     classes = {"promoter": "promoter", "ribosome_binding_site": "rbs",
                "terminator": "terminator", "operator": "operator",
-               "polyA_signal_sequence": "polya"}
+               "polya_signal_sequence": "polya"}
     if reg in classes:
         return classes[reg], "regulatory-class"
     terms = " ".join(qualifiers.get("SO", []) + qualifiers.get("SO_terms", [])

@@ -110,6 +110,29 @@ This standalone index is intended for evaluation. Deposited labels can be incomp
 
 Imported annotations may themselves be wrong. Exact matches and pLannotate calls produce sequence-based assignments. User edits are manual decisions. None is an experimentally validated function, expression result, or binding measurement merely because a figure displays it.
 
+## Preserve explicit regulatory semantics in custom indexes
+
+New indexes use manifest schema 3 and record the integrity-protected
+`explicit-regulatory-role-v1` search-type policy. pLannotate's descriptions CSV
+accepts a feature type without a `regulatory_class` field. For source features of
+type `regulatory`, the builder therefore encodes an equivalent engine type only
+when the reference role was resolved from explicit source semantics: promoter,
+terminator, RBS, operator or polyA signal. Neutral labels work; label heuristics
+and manual display assignments do not trigger conversion. The regulatory-class
+parser also handles `polyA_signal_sequence` after case normalization.
+
+Each manifest entry and engine description retains the source `type`, the
+`engine_type` actually sent to the builder, its basis, reference part hash, source
+URLs, aliases and alternatives. Source observations and `references.gb` are not
+rewritten. Hits remain predictions carrying source-derived semantics, including
+fragment calls; the type conversion does not establish functional completeness.
+
+Schema 1/2 snapshots retain their original hash contracts and report the legacy
+source-type passthrough policy. Adopting schema 3 requires a new private directory;
+existing snapshots are not modified. Reference freshness describes source-export
+identity and is separate from this recorded search-type policy. No new index is
+automatically activated in the studio.
+
 ## Compare a private index with the current library
 
 ```bash

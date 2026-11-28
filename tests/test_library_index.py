@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import json
 import subprocess
 import hashlib
+import csv
 
 import pytest
 
@@ -203,3 +204,49 @@ def test_index_status_cli_reports_stale_snapshot_without_confusing_integrity_exi
     monkeypatch.setattr('sys.argv',['auraconstruct','library','index-status',str(out),'--check-current-library','--db',str(db)])
     main();result=json.loads(capsys.readouterr().out)
     assert result['ready'] and result['freshness']=='stale'
+
+
+@pytest.mark.parametrize('regulatory_class,role,engine_type',[
+    ('promoter','promoter','promoter'),('terminator','terminator','terminator'),
+    ('ribosome_binding_site','rbs','RBS'),('operator','operator','operator'),
+    ('polyA_signal_sequence','polya','polyA_signal'),
+])
+def test_explicit_regulatory_semantics_survive_csv_without_rewriting_source(tmp_path,monkeypatch,regulatory_class,role,engine_type):
+    c=source();f=c.features[0];f.label='Neutral source label';f.type='regulatory';f.role=role
+    f.qualifiers={'regulatory_class':[regulatory_class]};db=tmp_path/'library.db'
+    ingest(to_genbank(c),'source.gb',source_url='https://example.org/typed-source',license_notice='test terms',path=db)
+    raw,revision=library.reference_genbank(db);before=stats(db);fake_builder(monkeypatch)
+    out=tmp_path/'index';library_index.build_index(out,db,profile='parts')
+    m=json.loads((out/'manifest.json').read_text());entry=m['entries'][0]
+    assert m['schema_version']==3 and m['search_type_policy']==library_index.SEARCH_TYPE_POLICY
+    assert entry['type']=='regulatory' and entry['engine_type']==engine_type and entry['engine_type_basis']=='explicit-source-regulatory-role'
+    with (out/'descriptions.csv').open() as stream:row=next(csv.DictReader(stream))
+    assert row['type']==engine_type and '"type": "regulatory"' in row['blurb'] and '"engine_type": "'+engine_type+'"' in row['blurb']
+    # This identity binds the transformed engine metadata to the reference entry.
+    assert row['sseqid']==entry['id'] and entry['part_sha256'] in row['blurb']
+    assert (out/'references.gb').read_bytes()==raw and library.reference_genbank(db)==(raw,revision) and stats(db)==before
+    assert read_bytes(raw,'references.gb')[0].features[0].type=='regulatory'
+
+
+def test_label_only_or_manual_regulatory_role_is_not_promoted(tmp_path,monkeypatch):
+    c=source();f=c.features[0];f.label='T7 terminator';f.type='regulatory';f.role='terminator';f.role_source='user-assigned'
+    db=tmp_path/'library.db';ingest(to_genbank(c),'source.gb',source_url='https://example.org/label-only',license_notice='test',path=db)
+    fake_builder(monkeypatch);out=tmp_path/'index';library_index.build_index(out,db,profile='parts')
+    entry=json.loads((out/'manifest.json').read_text())['entries'][0]
+    assert entry['role_resolution']=='consensus' and entry['engine_type']=='regulatory' and entry['engine_type_basis']=='source-type-passthrough'
+
+
+def test_schema_two_retains_its_hash_contract_and_new_type_policy_is_verified(tmp_path,monkeypatch):
+    db=seeded(tmp_path);fake_builder(monkeypatch);out=tmp_path/'index';library_index.build_index(out,db)
+    path=out/'manifest.json';m=json.loads(path.read_text());original=json.loads(path.read_text())
+    m['search_type_policy']='unrecognized';path.write_text(json.dumps(m))
+    assert not library_index.index_status(out)['ready']
+    m=json.loads(json.dumps(original));m['entries'][0]['engine_type']='terminator';path.write_text(json.dumps(m))
+    assert 'fingerprint mismatch' in library_index.index_status(out)['reason']
+    m=json.loads(json.dumps(original));m['schema_version']=2;m.pop('search_type_policy')
+    for entry in m['entries']+m['skipped']:
+        entry.pop('engine_type',None);entry.pop('engine_type_basis',None)
+    keys=('schema_version','reference_revision','reference_policy','selection_policy','engine_version','method','config','entries','skipped','files','profile')
+    m['index_fingerprint']=hashlib.sha256(json.dumps({k:m[k] for k in keys},sort_keys=True).encode()).hexdigest();path.write_text(json.dumps(m))
+    checked=library_index.index_status(out)
+    assert checked['ready'] and checked['search_type_policy']=='source-type-passthrough-v1'
